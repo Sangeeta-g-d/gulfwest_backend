@@ -1,0 +1,168 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+  <!-- Search Bar -->
+  <div class="row mb-4">
+    <div class="col-md-6 mx-auto">
+      <input type="text" id="categorySearch" class="form-control" placeholder="Search categories...">
+    </div>
+  </div>
+
+  <!-- Category Cards -->
+  <div class="row" id="categoryCards">
+    {% for category in categories %}
+      <div class="col-md-4 mb-4 category-card position-relative">
+        <div class="card shadow-sm border-left-primary h-100 py-2 position-relative">
+          <!-- Delete Icon -->
+          <div class="card-body text-center">
+            <h5 class="card-title category-name">{{ category.category_name }}</h5>
+            <div class="d-flex justify-content-center mt-3">
+              <!-- Button triggers modal and stores category ID -->
+              <a href="#" class="btn btn-outline-primary btn-sm mx-1" 
+                 data-toggle="modal" 
+                 data-target="#uploadModal" 
+                 data-category-id="{{ category.id }}">
+                Upload Excel
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col-12 text-center">
+        <p>No categories available.</p>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Modal for file upload -->
+<div class="modal fade" id="uploadModal" tabindex="-1" role="dialog" aria-labelledby="uploadModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadModalLabel">Upload Bulk Products</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <!-- Don't set action here statically -->
+      <form id="uploadForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="file">Choose Excel/CSV file</label>
+            <input type="file" name="file" id="file" class="form-control" accept=".xlsx,.xls,.csv" required>
+          </div>
+          <!-- Hidden field to store category ID -->
+          <input type="hidden" name="category_id" id="category_id">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Upload</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap 4 bundle (includes Popper) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<!-- Your custom JS -->
+<script>
+  $('#uploadModal').on('show.bs.modal', function (event) {
+    var button = $(event.relatedTarget);
+    var categoryId = button.data('category-id');
+    var form = $('#uploadForm');
+    $('#category_id').val(categoryId);
+
+    var url = "{% url 'upload_bulk_products' 0 %}".replace('0', categoryId);
+    form.attr('action', url);
+  });
+
+  document.getElementById('categorySearch').addEventListener('keyup', function () {
+    const searchTerm = this.value.toLowerCase();
+    const cards = document.querySelectorAll('.category-card');
+
+    cards.forEach(card => {
+      const name = card.querySelector('.category-name').textContent.toLowerCase();
+      card.style.display = name.includes(searchTerm) ? 'block' : 'none';
+    });
+  });
+</script>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("status") === "success") {
+    Toastify({
+      text: "Product details imported successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white", // Light green to white gradient
+        color: "black", // Text color black
+    },
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+  if (urlParams.get("status") === "failure") {
+    Toastify({
+      text: "Failed to import product details!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white", // Light green to white gradient
+        color: "black", // Text color black
+    },
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+  if (urlParams.get("status") === "nofile") {
+    Toastify({
+      text: "No file selected or invalid request.",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      backgroundColor: "#28a745",
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+  if (urlParams.get("added") === "true") {
+    Toastify({
+      text: "Product added successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white", // Light green to white gradient
+        color: "black", // Text color black
+    },
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+</script>
+
+
+{% endblock %}

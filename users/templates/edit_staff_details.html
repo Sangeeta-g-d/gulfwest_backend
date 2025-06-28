@@ -1,0 +1,81 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+  <div class="row">
+    <div class="col-lg-12 mb-4">
+      <div class="card">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Edit Staff Details</h6>
+        </div>
+
+        <div class="card-body">
+          <form method="POST" id="editStaffForm">
+            {% csrf_token %}
+
+            <!-- Full Name & Email -->
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Full Name</label>
+                <input type="text" name="full_name" class="form-control" required placeholder="Enter full name" value="{{ staff.full_name }}">
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required placeholder="Enter email address" value="{{ staff.user.email }}">
+              </div>
+            </div>
+
+            <!-- Phone, City, Designation -->
+            <div class="row">
+              <div class="col-md-4 form-group mb-3">
+                <label>Phone Number</label>
+                <input type="text" name="phone_number" class="form-control" placeholder="Enter phone number" value="{{ staff.user.phone_number }}">
+              </div>
+
+              <div class="col-md-4 form-group mb-3">
+                <label>City</label>
+                <input type="text" name="city" class="form-control" placeholder="Enter city" value="{{ staff.user.city }}">
+              </div>
+
+              <div class="col-md-4 form-group mb-3">
+                <label>Designation</label>
+                <input type="text" name="designation" class="form-control" required placeholder="Enter designation" value="{{ staff.designation }}">
+              </div>
+            </div>
+
+            <!-- Manager Checkboxes -->
+            <!-- Roles Selection -->
+<div class="row">
+  <div class="col-md-12 form-group mb-3">
+    <label>Assign Roles</label>
+    <div class="row">
+      {% for role in roles %}
+        <div class="col-md-3">
+          <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="roles" value="{{ role.id }}"
+              id="role_{{ role.id }}"
+              {% if role in staff.roles.all %}checked{% endif %}>
+            <label class="form-check-label" for="role_{{ role.id }}">
+              {{ role.name }}
+            </label>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+
+            <!-- Submit Buttons -->
+            <div class="form-group mb-3">
+              <button type="submit" class="btn btn-primary">Update Staff</button>
+              <a href="{% url 'staff_details' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

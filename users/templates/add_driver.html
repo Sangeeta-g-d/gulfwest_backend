@@ -1,0 +1,106 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+
+  <div class="row">
+    <div class="col-lg-12 mb-4">
+      <div class="card">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Add driver</h6>
+      
+        </div>
+        <div class="card-body">
+          <form method="POST" id="addDriverForm" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- Full Name -->
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Full Name</label>
+                <input type="text" name="full_name" class="form-control" required placeholder="Enter full name">
+              </div>
+
+              <!-- Email -->
+              <div class="col-md-6 form-group mb-3">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" required placeholder="Enter email address">
+              </div>
+            </div>
+
+            <div class="row">
+              <!-- Phone -->
+              <div class="col-md-6 form-group mb-3">
+                <label>Phone Number</label>
+                <input type="text" name="phone_number" class="form-control" placeholder="Enter phone number">
+              </div>
+
+
+              <!-- Designation -->
+              <div class="col-md-6 form-group mb-3">
+                <label>Profile Image</label>
+                <input type="file" name="profile" class="form-control" required
+                >
+              </div>
+            </div>
+            <div class="form-group mb-3">
+              <button type="submit" class="btn btn-primary">Add Driver</button>
+              <a href="{% url 'driver' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+
+if (urlParams.get("status") === "email_exists") {
+  Toastify({
+    text: "User with this email already exists.",
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "center",
+    style: {
+      background: "white",
+      color: "black",
+    },
+  }).showToast();
+}
+
+if (urlParams.get("status") === "phone_exists") {
+  Toastify({
+    text: "User with this phone number already exists.",
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "center",
+    style: {
+      background: "white",
+      color: "black",
+    },
+  }).showToast();
+}
+
+if (urlParams.get("status") === "added") {
+  Toastify({
+    text: "Driver added successfully.",
+    duration: 3000,
+    close: true,
+    gravity: "top",
+    position: "center",
+    style: {
+      background: "green",
+      color: "white",
+    },
+  }).showToast();
+}
+
+// Clean up URL
+const newUrl = window.location.origin + window.location.pathname;
+window.history.replaceState({}, document.title, newUrl);
+
+</script>
+
+{% endblock %}

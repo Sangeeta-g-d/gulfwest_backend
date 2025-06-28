@@ -1,0 +1,153 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+
+<div class="container-fluid" id="container-wrapper">
+  <div class="row">
+    <div class="col-lg-12 mb-4">
+      <!-- Simple Tables -->
+      <div class="card">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">List of Customers</h6>
+          <a href="/add_staff/" class="btn btn-primary">add new</a>
+        </div>
+        <div id="confirmToast"
+          style="display: none; position: fixed; bottom: 20px; right: 20px; background-color: #f39c12; color: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); z-index: 9999;">
+          <p>Are you sure you want to delete this user?</p>
+          <div style="display: flex; gap: 10px; justify-content: flex-end;">
+            <button id="confirmDelete" class="btn btn-sm btn-light text-dark">Confirm</button>
+            <button id="cancelDelete" class="btn btn-sm btn-dark">Cancel</button>
+          </div>
+        </div>
+        <div class="table-responsive">
+          <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+              <tr>
+                <th>ID</th>
+                <th>Full Name</th>
+                <th>Email</th>
+                <th>Phone Number</th>
+                <th>Designation</th>
+                <th>City</th>
+                <th>Roles</th>
+                
+                <th>Action</th>
+              </tr>
+            </thead>
+          <tbody>
+  {% for x in details %}
+  <tr>
+    <td>{{ x.id }}</td>
+    <td>{{ x.full_name }}</td>
+    <td>{{ x.user.email }}</td>
+    <td>{{ x.user.phone_number }}</td>
+    <td>{{ x.designation }}</td>
+    <td>{{ x.user.city }}</td>
+    <td>
+      {% if x.get_role_names %}
+        {{ x.get_role_names }}
+      {% else %}
+        <span class="text-muted">No roles assigned</span>
+      {% endif %}
+    </td>
+    <td>
+      <a href="{% url 'edit_staff_details' x.id %}" class="btn btn-sm btn-dark" title="Edit">
+        <i class="fas fa-edit"></i>
+      </a>
+      <a href="#" class="btn btn-sm btn-danger delete-btn" data-id="{{ x.id }}">
+        <i class="fas fa-trash-alt"></i>
+      </a>
+    </td>
+  </tr>
+  {% empty %}
+  <tr>
+    <td colspan="8" class="text-center text-muted">No staff members found.</td>
+  </tr>
+  {% endfor %}
+</tbody>
+          </table>
+        </div>
+
+        <div class="card-footer"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- delete script -->
+ <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".delete-btn");
+
+    deleteButtons.forEach(button => {
+      button.addEventListener("click", function (e) {
+        e.preventDefault();
+        const staffId = this.getAttribute("data-id");
+
+        if (confirm("Are you sure you want to delete this staff member?")) {
+          // Redirect to delete URL (make sure it exists in your urls.py)
+          window.location.href = `/delete_staff/${staffId}/`;
+        }
+      });
+    });
+  });
+</script>
+
+
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("status") === "true") {
+    Toastify({
+      text: "Staff details added successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white", // Light green to white gradient
+        color: "black", // Text color black
+      },
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+
+if (urlParams.get("status") === "deleted") {
+    Toastify({
+      text: "Staff details deleted successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white", // Light green to white gradient
+        color: "black", // Text color black
+      },
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+if (urlParams.get("status") === "updated") {
+    Toastify({
+      text: "Staff details updated successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white", // Light green to white gradient
+        color: "black", // Text color black
+      },
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+</script>
+
+{% endblock %}

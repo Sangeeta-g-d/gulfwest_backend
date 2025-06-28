@@ -1,0 +1,140 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+  <div class="row">
+    <div class="col-lg-12 mb-4">
+      <div class="card">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Edit Flash Sale</h6>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Flash Sale Name</label>
+                <input type="text" name="name" class="form-control" required value="{{ sale.name }}">
+              </div>
+              <div class="col-md-6 form-group mb-3">
+                <label>Tagline</label>
+                <input type="text" name="tagline" class="form-control" value="{{ sale.tagline }}">
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Start Time</label>
+                <input type="datetime-local" name="start_time" class="form-control"
+                  value="{{ sale.start_time|date:'Y-m-d\\TH:i' }}" required>
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label>End Time</label>
+                <input type="datetime-local" name="end_time" class="form-control"
+                  value="{{ sale.end_time|date:'Y-m-d\\TH:i' }}" required>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Discount Percentage (%)</label>
+                <input type="number" name="discount_percentage" class="form-control" required min="1" max="100"
+                  value="{{ sale.discount_percentage }}">
+              </div>
+              <div class="col-md-6 form-group mb-3">
+                <label>Background Image</label>
+                <input type="file" name="background_image" class="form-control" accept="image/*">
+                {% if sale.background_image %}
+                  <div class="mt-2">
+                    <small>Current Image:</small><br>
+                    <img src="{{ sale.background_image.url }}" width="100">
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Apply To</label>
+                <select class="form-control" name="apply_type" id="applyType" required>
+                  <option value="">-- Select --</option>
+                  <option value="category" {% if sale.categories.all %}selected{% endif %}>Specific Categories</option>
+                  <option value="product" {% if sale.products.all %}selected{% endif %}>Specific Products</option>
+                </select>
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label>Status</label>
+                <select name="is_active" class="form-control">
+                  <option value="1" {% if sale.is_active %}selected{% endif %}>Active</option>
+                  <option value="0" {% if not sale.is_active %}selected{% endif %}>Inactive</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Category Selection -->
+            <div class="form-group mb-3 {% if not sale.categories.all %}d-none{% endif %}" id="categorySelect">
+              <label>Select Categories</label>
+              <input type="text" class="form-control mb-2" placeholder="Search categories..."
+                onkeyup="filterCheckboxes(this, 'category-options')">
+              <div id="category-options" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                {% for category in categories %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="categories" value="{{ category.id }}"
+                      id="cat{{ category.id }}"
+                      {% if category in sale.categories.all %}checked{% endif %}>
+                    <label class="form-check-label" for="cat{{ category.id }}">{{ category.category_name }}</label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <!-- Product Selection -->
+            <div class="form-group mb-3 {% if not sale.products.all %}d-none{% endif %}" id="productSelect">
+              <label>Select Products</label>
+              <input type="text" class="form-control mb-2" placeholder="Search products..."
+                onkeyup="filterCheckboxes(this, 'product-options')">
+              <div id="product-options" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+                {% for product in products %}
+                  <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="products" value="{{ product.id }}"
+                      id="prod{{ product.id }}"
+                      {% if product in sale.products.all %}checked{% endif %}>
+                    <label class="form-check-label" for="prod{{ product.id }}">{{ product.display_name }}</label>
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+
+            <div class="form-group mb-3">
+              <button type="submit" class="btn btn-primary">Update Flash Sale</button>
+              <a href="{% url 'flash_sale' %}" class="btn btn-secondary">Cancel</a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function filterCheckboxes(input, containerId) {
+    const filter = input.value.toLowerCase();
+    const checkboxes = document.querySelectorAll(`#${containerId} .form-check`);
+    checkboxes.forEach(cb => {
+      const label = cb.textContent.toLowerCase();
+      cb.style.display = label.includes(filter) ? '' : 'none';
+    });
+  }
+
+  document.getElementById('applyType').addEventListener('change', function () {
+    const catBox = document.getElementById('categorySelect');
+    const prodBox = document.getElementById('productSelect');
+    catBox.classList.add('d-none');
+    prodBox.classList.add('d-none');
+    if (this.value === 'category') catBox.classList.remove('d-none');
+    else if (this.value === 'product') prodBox.classList.remove('d-none');
+  });
+</script>
+{% endblock %}

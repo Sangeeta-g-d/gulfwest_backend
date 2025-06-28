@@ -1,0 +1,160 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+
+<div class="container-fluid" id="container-wrapper">
+
+  <!-- Summary Cards -->
+   <div class="row mb-4">
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card shadow h-100 py-2 border-left-primary">
+        <div class="card-body">
+          <div class="row align-items-center no-gutters">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Orders</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_orders }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-shopping-cart fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card shadow h-100 py-2 border-left-success">
+        <div class="card-body">
+         <div class="row align-items-center no-gutters">
+  <div class="col mr-2">
+    <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Total Revenue</div>
+    <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_revenue }} SAR</div> <!-- or use SAR 42,800 -->
+  </div>
+  <div class="col-auto">
+    <i class="fas fa-coins fa-2x text-gray-300"></i> <!-- changed from fa-dollar-sign -->
+  </div>
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card shadow h-100 py-2 border-left-info">
+        <div class="card-body">
+          <div class="row align-items-center no-gutters">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Customers</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_customers }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-users fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6 mb-4">
+      <div class="card shadow h-100 py-2 border-left-warning">
+        <div class="card-body">
+          <div class="row align-items-center no-gutters">
+            <div class="col mr-2">
+              <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Products</div>
+              <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_products }}</div>
+            </div>
+            <div class="col-auto">
+              <i class="fas fa-apple-alt fa-2x text-gray-300"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row: Order Chart + Top Products -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow h-100">
+        <div class="card-header bg-secondary text-white">
+          <h6 class="m-0 font-weight-bold">Order Status Distribution</h6>
+        </div>
+        <div class="card-body text-center">
+          <img src="data:image/png;base64,{{ order_status_chart }}" class="img-fluid" alt="Order Status Chart">
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow h-100">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold">Top-Selling Grocery Items</h6>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            {% for product in top_products %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ product.variant__product__display_name }}
+                <span class="badge badge-primary badge-pill">{{ product.total_sold }} Sold</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item">No data available.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row: Promo Codes + Flash Sales -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card shadow h-100">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold">Active Promo Codes</h6>
+          <a href="/add_promo_code/" class="btn btn-info btn-sm">+ Add Promo</a>
+        </div>
+        <div class="card-body">
+          <ul class="list-group">
+            {% for promo in active_promos %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                <div>
+                  <strong>{{ promo.code }}</strong>
+                  <small class="text-muted d-block">{{ promo.description|default:"No description" }}</small>
+                </div>
+                <span class="badge badge-info badge-pill">
+                  {{ promo.discount_value }}{% if promo.discount_type == 'percentage' %}%{% else %} SAR{% endif %}
+                </span>
+              </li>
+            {% empty %}
+              <li class="list-group-item">No active promo codes.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-6">
+      <div class="card shadow h-100">
+        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+          <h6 class="m-0 font-weight-bold">Flash Sales</h6>
+          <a href="/add_flash_sale/" class="btn btn-danger btn-sm">+ Add New</a>
+        </div>
+        <div class="card-body">
+          <ul class="list-group mb-0">
+            {% for sale in flash_sales %}
+              <li class="list-group-item d-flex justify-content-between align-items-center">
+                {{ sale.name }}
+                <span class="badge badge-danger badge-pill">{{ sale.discount_percentage }}% OFF</span>
+              </li>
+            {% empty %}
+              <li class="list-group-item">No active flash sales.</li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

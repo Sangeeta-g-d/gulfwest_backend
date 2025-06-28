@@ -1,0 +1,72 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+
+  <div class="row">
+    <div class="col-lg-3 mb-4">
+      <div class="card border-left-primary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Orders</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_orders }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 mb-4">
+      <div class="card border-left-success shadow h-100 py-2">
+        <div class="card-body">
+          <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Delivered Orders</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800">{{ delivered_orders }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 mb-4">
+      <div class="card border-left-warning shadow h-100 py-2">
+        <div class="card-body">
+          <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Pending Orders</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800">{{ pending_orders }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 mb-4">
+      <div class="card border-left-danger shadow h-100 py-2">
+        <div class="card-body">
+          <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Total Revenue</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800">₹{{ total_revenue }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 mb-4">
+      <div class="card border-left-info shadow h-100 py-2">
+        <div class="card-body">
+          <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Top-Selling Product</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800">{{ top_product }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 mb-4">
+      <div class="card border-left-secondary shadow h-100 py-2">
+        <div class="card-body">
+          <div class="text-xs font-weight-bold text-secondary text-uppercase mb-1">Total Products</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_products }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-3 mb-4">
+      <div class="card border-left-dark shadow h-100 py-2">
+        <div class="card-body">
+          <div class="text-xs font-weight-bold text-dark text-uppercase mb-1">Total Customers</div>
+          <div class="h5 mb-0 font-weight-bold text-gray-800">{{ total_customers }}</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

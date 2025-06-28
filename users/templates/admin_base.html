@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <!-- <link href="/static/assets/img/logo/logo.png" rel="icon"> -->
+  <title>GulfWest Dashboard</title>
+  <link href="/static/assets/vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+  <link href="/static/assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" type="text/css">
+  <link href="/static/assets/css/ruang-admin.min.css" rel="stylesheet">
+
+  <!-- toastify link -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <!-- Include Toastify CSS -->
+<link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css"/>
+
+<link rel="stylesheet" href="/static/assets/css/custom.css">
+
+<!-- Include Toastify JS -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+ <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+ <!-- Select2 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<!-- Bootstrap-select CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/css/bootstrap-select.min.css" />
+
+<!-- jQuery (required) -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS (if not already included) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+<!-- Bootstrap-select JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.14.0-beta3/js/bootstrap-select.min.js"></script>
+
+
+
+<style>
+  /* Prevent wrapping inside table headers and cells */
+.table th, .table td {
+  white-space: nowrap;
+}
+
+/* Ensure the table doesn't shrink */
+.table {
+  table-layout: auto;
+}
+
+/* Make sure the table container scrolls if necessary */
+.table-responsive {
+  overflow-x: auto;
+}
+/* Sidebar responsive behavior */
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    min-height: 100vh;
+    width: 14rem;
+    background-color: #fff;
+    box-shadow: 0 .15rem 1.75rem 0 rgba(58, 59, 69, .15);
+    z-index: 1000;
+    transition: transform 0.3s ease;
+}
+
+/* Toggle Button (hamburger) */
+.sidebar-toggle {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1100;
+    background: none;
+    border: none;
+    font-size: 1.8rem;
+    cursor: pointer;
+    color: #000;
+}
+
+/* Mobile view - hide sidebar by default */
+
+/* Desktop view - main content shifts */
+@media (min-width: 768px) {
+    .container-fluid {
+        margin-left: 14rem;
+        width: calc(100% - 14rem);
+    }
+}
+
+</style>
+</head>
+
+<body id="page-top">
+  <div id="wrapper">
+ <!-- Sidebar -->
+<ul class="navbar-nav sidebar sidebar-light accordion" id="accordionSidebar">
+  <a class="sidebar-brand d-flex align-items-center justify-content-center" href="/admin_dashboard/">
+    <div class="sidebar-brand-icon">
+      <img src="/static/assets/img/gulf-logo.png">
+    </div>
+    <div class="sidebar-brand-text mx-3">GulfWest</div>
+  </a>
+
+  <hr class="sidebar-divider my-0">
+
+  <!-- Dashboard -->
+  <li class="nav-item {% if current_url_name == 'admin_dashboard' or current_url_name == 'staff_dashboard' %}active{% endif %}">
+    <a class="nav-link" href="{% if request.user.is_superuser %}/admin_dashboard/{% else %}/staff_dashboard/{% endif %}">
+      <i class="fas fa-tachometer-alt"></i>
+      <span>Dashboard</span>
+    </a>
+  </li>
+
+  {% if request.user.is_superuser or 'Sales Admin' in user_roles %}
+    <!-- Categories -->
+    <li class="nav-item {% if current_url_name == 'category' %}active{% endif %}">
+      <a class="nav-link" href="/category_list/">
+        <i class="fas fa-list-alt"></i>
+        <span>Categories</span>
+      </a>
+    </li>
+
+    <!-- View Products -->
+    <li class="nav-item {% if current_url_name == 'products' %}active{% endif %}">
+      <a class="nav-link" href="/view_products/">
+        <i class="fas fa-cubes"></i>
+        <span>View Products</span>
+      </a>
+    </li>
+
+    <!-- Add Products -->
+    <li class="nav-item {% if current_url_name == 'add-products' %}active{% endif %}">
+      <a class="nav-link" href="/add_product/">
+        <i class="fas fa-plus-square"></i>
+        <span>Add Products</span>
+      </a>
+    </li>
+
+    <!-- Excel Import -->
+    <li class="nav-item {% if current_url_name == 'excel' %}active{% endif %}">
+      <a class="nav-link" href="/products/">
+        <i class="fas fa-file-excel"></i>
+        <span>Import from Excel</span>
+      </a>
+    </li>
+
+    <!-- Flash Sale -->
+    <li class="nav-item {% if current_url_name == 'flash_sale' %}active{% endif %}">
+      <a class="nav-link" href="/flash_sale/">
+        <i class="fas fa-bolt"></i>
+        <span>Flash Sale</span>
+      </a>
+    </li>
+
+    <!-- Promo Code -->
+    <li class="nav-item {% if current_url_name == 'promo_code' %}active{% endif %}">
+      <a class="nav-link" href="/promo_code/">
+        <i class="fas fa-ticket-alt"></i>
+        <span>Promo Code</span>
+      </a>
+    </li>
+  {% endif %}
+
+  {% if request.user.is_superuser or 'WH admin' in user_roles %}
+    <!-- Orders -->
+    <li class="nav-item {% if current_url_name == 'orders' %}active{% endif %}">
+      <a class="nav-link" href="/orders/">
+        <i class="fas fa-shopping-cart"></i>
+        <span>Orders</span>
+      </a>
+    </li>
+
+    <!-- Driver -->
+    <li class="nav-item {% if current_url_name == 'driver' %}active{% endif %}">
+      <a class="nav-link" href="/driver/">
+        <i class="fas fa-truck-moving"></i>
+        <span>Driver</span>
+      </a>
+    </li>
+  {% endif %}
+
+  {% if request.user.is_superuser %}
+    <!-- Staff -->
+    <li class="nav-item {% if current_url_name == 'staff' %}active{% endif %}">
+      <a class="nav-link" href="/staff_details/">
+        <i class="fas fa-users-cog"></i>
+        <span>Staff</span>
+      </a>
+    </li>
+
+    <!-- Customers -->
+    <li class="nav-item {% if current_url_name == 'customers' %}active{% endif %}">
+      <a class="nav-link" href="/customers/">
+        <i class="fas fa-user"></i>
+        <span>Customers</span>
+      </a>
+    </li>
+  {% endif %}
+
+  <hr class="sidebar-divider">
+</ul>
+
+
+
+
+    <!-- Sidebar -->
+    <div id="content-wrapper" class="d-flex flex-column">
+      <div id="content">
+        <!-- TopBar -->
+        <nav class="navbar navbar-expand navbar-light bg-navbar topbar mb-4 static-top">
+          <button id="sidebarToggleTop" class="btn btn-link rounded-circle mr-3">
+            <i class="fa fa-bars"></i>
+          </button>
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item dropdown no-arrow">
+              {% if request.user.is_superuser %}
+              <a class=" btn btn-primary btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#addCategoryModal" style="height: auto; margin-top: 18px;"  role="button">
+                + Add Category
+              </a>
+               <a class=" btn btn-primary btn-sm" href="#" data-bs-toggle="modal" data-bs-target="#addUnitModal" style="height: auto; margin-top: 18px;"  role="button">
+                + Add Unit
+              </a>
+             {% endif %}
+            </li>
+            <div class="topbar-divider d-none d-sm-block"></div>
+        
+            <li class="nav-item dropdown no-arrow">
+              <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown"
+                aria-haspopup="true" aria-expanded="false">
+                <img class="img-profile rounded-circle" src="/static/assets/img/user.jpg" style="max-width: 60px">
+                <span class="ml-2 d-none d-lg-inline text-white small">{{request.user.email}}</span>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+               
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="/logout">
+                  <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Logout
+                </a>
+              </div>
+            </li>
+          </ul>
+        </nav>
+        <!-- Topbar -->
+
+        {% block content %}
+
+        {% endblock %}
+
+    </div>
+   
+  </div>
+</div>
+
+<!-- Model -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-labelledby="addCategoryModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="addCategoryForm" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">Add Category</h5>
+          <button type="button" class="btn" data-bs-dismiss="modal">X</button>
+        </div>
+        <div class="modal-body">
+
+          <div class="form-group mb-2">
+            <label for="period_number">Category</label>
+            <input type="text" class="form-control" name="category" id="category" required>
+            <label for="img">Background Image</label>
+            <input type="file" class="form-control" name="background_img" id="img" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+  </div>
+
+<!-- Unit modal -->
+ <!-- Model -->
+<!-- Updated Model Form -->
+<div class="modal fade" id="addUnitModal" tabindex="-1" aria-labelledby="addUnitModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="addUnitForm" method="post">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addUnitModalLabel">Add Unit</h5>
+          <button type="button" class="btn" data-bs-dismiss="modal">X</button>
+        </div>
+        <div class="modal-body">
+
+          <div class="form-group mb-2">
+            <label for="name">Unit Name</label>
+            <input type="text" class="form-control" name="name" id="name" required placeholder="e.g., Kilogram">
+          </div>
+
+          <div class="form-group mb-2">
+            <label for="abbreviation">Abbreviation</label>
+            <input type="text" class="form-control" name="abbreviation" id="abbreviation" required placeholder="e.g., kg">
+          </div>
+
+          <div class="form-group mb-2">
+            <label for="conversion_factor">Conversion Factor to Base</label>
+            <input type="number" step="0.0001" class="form-control" name="conversion_factor" id="conversion_factor" required placeholder="e.g., 1000">
+          </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Save</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<!-- add category script -->
+  <script>
+    $(document).ready(function () {
+      $('#addCategoryForm').submit(function (e) {
+        e.preventDefault();  // Prevent default form submission
+  
+        const formData = new FormData(this);
+        console.log(formData.get('category'));
+        fetch("{% url 'add_category' %}", {
+          method: "POST",
+          headers: {
+            "X-CSRFToken": '{{ csrf_token }}'
+          },
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Close modal
+          var modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
+          modal.hide();
+  
+          // Clear input
+          $('#category').val('');
+  
+          // Show Toast
+          Toastify({
+            text: data.message,
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            style: {
+        background: "linear-gradient(to right, #ffffff, #c3e6cb)", // Light green to white gradient
+        color: "black", // Text color black
+    },
+            stopOnFocus: true
+          }).showToast();
+  
+          // Optional: Reload or update list dynamically
+          // location.reload();
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Toastify({
+            text: "Something went wrong.",
+            duration: 3000,
+            gravity: "top",
+            position: "center",
+            backgroundColor: "#dc3545"
+          }).showToast();
+        });
+      });
+    });
+  </script>
+<!-- add Unit script -->
+
+<script>
+  $(document).ready(function () {
+    $('#addUnitForm').submit(function (e) {
+      e.preventDefault();  // Prevent default form submission
+
+      const formData = new FormData(this);
+      console.log(formData.get('unit_select'));  // Fix key if needed
+
+      fetch("{% url 'add_unit' %}", {
+        method: "POST",
+        headers: {
+          "X-CSRFToken": '{{ csrf_token }}'
+        },
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        // Close modal
+        var modal = bootstrap.Modal.getInstance(document.getElementById('addUnitModal'));
+        modal.hide();
+
+        // Clear input
+        $('#unit_select').val('');
+
+        // Show Toast and reload after it disappears
+        Toastify({
+          text: data.message,
+          duration: 3000,
+          gravity: "top",
+          position: "center",
+          style: {
+        background: "linear-gradient(to right, #ffffff, #c3e6cb)", // Light green to white gradient
+        color: "black", // Text color black
+    },
+          stopOnFocus: true,
+          callback: function () {
+            location.reload();   // <-- Reload page after toast disappears
+          }
+        }).showToast();
+      })
+      .catch(error => {
+        console.error('Error:', error);
+
+        Toastify({
+          text: "Something went wrong.",
+          duration: 3000,
+          gravity: "top",
+          position: "center",
+          backgroundColor: "#dc3545",
+          stopOnFocus: true,
+          callback: function () {
+            location.reload();   // <-- Reload page even if error
+          }
+        }).showToast();
+      });
+    });
+  });
+</script>
+
+  
+<span id="version-ruangadmin" style="display:none;"></span>
+<!-- Scroll to top -->
+<a class="scroll-to-top rounded" href="#page-top">
+  <i class="fas fa-angle-up"></i>
+</a>
+
+<script src="/static/assets/vendor/jquery/jquery.min.js"></script>
+<script src="/static/assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="/static/assets/vendor/jquery-easing/jquery.easing.min.js"></script>
+<script src="/static/assets/js/ruang-admin.min.js"></script>
+<!-- Toastify JS -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<!-- Toastify JS -->
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+
+<script src="/static/assets/js/custom.js"></script>
+<!-- Bootstrap 5 JS Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS (ensure version matches your CSS) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
+
+
+</body>
+
+</html>

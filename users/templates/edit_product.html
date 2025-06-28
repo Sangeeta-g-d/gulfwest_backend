@@ -1,0 +1,286 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper" style="margin-bottom: 30px;">
+
+  <!-- Product Form -->
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+      <h6 class="m-0 font-weight-bold text-primary">Edit Product - {{ product.display_name }}</h6>
+      <a href="{% url 'view_products' %}" class="btn btn-secondary btn-sm">Cancel</a>
+    </div>
+    <div class="card-body">
+     <form method="POST" id="productForm">
+  {% csrf_token %}
+  <div class="row">
+    <div class="col-md-6">
+      <div class="form-group">
+        <label>Category</label>
+        <select name="category" class="form-control" required>
+          <option value="">Select Category</option>
+          {% for cat in categories %}
+            <option value="{{ cat.id }}" {% if cat.id == product.category_id %}selected{% endif %}>{{ cat.category_name }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Display Name</label>
+        <input type="text" name="display_name" class="form-control" value="{{ product.display_name }}" required>
+      </div>
+      <div class="form-group">
+        <label>Brand Name</label>
+        <input type="text" name="brand_name" class="form-control" value="{{ product.brand_name }}">
+      </div>
+      <div class="form-group">
+        <label>Calories</label>
+        <input type="text" name="calories" class="form-control" value="{{ product.calories }}">
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="form-group">
+        <label>SAP Code</label>
+        <input type="text" name="SAP_code" class="form-control" value="{{ product.SAP_code }}">
+      </div>
+      <div class="form-group">
+        <label>Water Content</label>
+        <input type="text" name="water" class="form-control" value="{{ product.water }}">
+      </div>
+      <div class="form-group">
+        <label>Carbs</label>
+        <input type="text" name="carbs" class="form-control" value="{{ product.carbs }}">
+      </div>
+      <div class="form-check mt-3">
+        <input type="checkbox" name="is_active" class="form-check-input" id="isActiveCheck" {% if product.is_active %}checked{% endif %}>
+        <label class="form-check-label" for="isActiveCheck">Active</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Description moved here -->
+  <div class="row mt-3">
+    <div class="col-12">
+      <div class="form-group">
+        <label>Description</label>
+        <textarea name="description" class="form-control" rows="4">{{ product.description }}</textarea>
+      </div>
+    </div>
+  </div>
+
+  <button type="submit" class="btn btn-primary mt-3">Update Product</button>
+</form>
+
+    </div>
+  </div>
+
+  <!-- Product Variants Section -->
+  <h5 class="mb-3">Product Variants</h5>
+  <div class="row">
+  {% for variant in variants %}
+  <div class="col-md-6 mb-4">
+  <div class="card p-3 position-relative">
+    <!-- Card Content Two-Column Layout -->
+    <div class="row">
+      <div class="col-6">
+        <p><strong>Selling Quantity:</strong> {{ variant.selling_quantity }}</p>
+        
+        <p><strong>Price:</strong> {{ variant.price }}</p>
+       
+      </div>
+      <div class="col-6">
+       <p><strong>Selling Unit:</strong> {{ variant.selling_unit.name }}</p>
+        <p><strong>Discount Price:</strong> {{ variant.discount_price }}</p>
+         {% if variant.available %}
+                      <span class="badge badge-success">Available</span>
+                      {% else %}
+                      <span class="badge badge-danger">Unavailable</span>
+                      {% endif %}
+      </div>
+    </div>
+
+    <!-- Buttons at bottom -->
+    <div class="mt-3">
+      <button class="btn btn-sm btn-primary me-2" data-bs-toggle="modal" data-bs-target="#editVariantModal{{ variant.id }}">Edit</button>
+      <a href="{% url 'delete_variant' variant.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this variant?')">Delete</a>
+    </div>
+  </div>
+</div>
+  <!-- Edit Variant Modal -->
+<div class="modal fade" id="editVariantModal{{ variant.id }}" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" action="{% url 'edit_variant' variant.id %}" class="modal-content">
+      {% csrf_token %}
+      <div class="modal-header">
+        <h5 class="modal-title">Edit Product Variant</h5>
+        <button type="button" class="btn-close btn btn-light" data-bs-dismiss="modal">X</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group mb-2">
+          <label>Selling Quantity</label>
+          <input type="number" step="0.01" name="selling_quantity" class="form-control" value="{{ variant.selling_quantity }}" required>
+        </div>
+
+        <div class="form-group mb-2">
+          <label>Selling Unit</label>
+          <select name="selling_unit" class="form-control" required>
+            {% for unit in units %}
+              <option value="{{ unit.id }}" {% if unit.id == variant.selling_unit_id %}selected{% endif %}>
+                {{ unit.name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="form-group mb-2">
+          <label>Price</label>
+          <input type="number" step="0.01" name="price" class="form-control" value="{{ variant.price }}" required>
+        </div>
+
+        <div class="form-group mb-2">
+          <label>Discount Price</label>
+          <input type="number" step="0.01" name="discount_price" class="form-control" value="{{ variant.discount_price }}">
+        </div>
+
+        <div class="form-check mt-3">
+          <input type="checkbox" class="form-check-input" name="available" id="availableCheckbox{{ variant.id }}" {% if variant.available %}checked{% endif %}>
+          <label class="form-check-label" for="availableCheckbox{{ variant.id }}">Available</label>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="submit" class="btn btn-primary">Save</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+  {% empty %}
+  <p>No variants found for this product.</p>
+  {% endfor %}
+</div>
+
+
+
+  <!-- Product Images Section -->
+  <h5 class="mt-5 mb-3">Product Images</h5>
+  <div class="row">
+    {% for image in images %}
+    <div class="col-md-3 mb-4">
+      <div class="card">
+        <img src="{{ image.image.url }}" class="card-img-top" alt="Product Image" style="max-height: 200px; object-fit: cover;">
+        <div class="card-body text-center">
+          <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editImageModal{{ image.id }}">Edit</button>
+          <a href="{% url 'delete_product_image' image.id %}" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this image?')">Delete</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Image Modal -->
+    <div class="modal fade" id="editImageModal{{ image.id }}" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog">
+        <form method="POST" enctype="multipart/form-data" action="{% url 'edit_product_image' image.id %}" class="modal-content">
+          {% csrf_token %}
+          <div class="modal-header">
+            <h5 class="modal-title">Edit Image</h5>
+            <button type="button" class="btn-close btn btn-light" data-bs-dismiss="modal">X</button>
+          </div>
+          <div class="modal-body">
+            <div class="text-center mb-3">
+              <img src="{{ image.image.url }}" style="max-width: 100%; height: auto;">
+            </div>
+            <div class="form-group">
+              <label>Upload New Image</label>
+              <input type="file" name="image" class="form-control" required>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary">Update</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12"><p>No images available.</p></div>
+    {% endfor %}
+  </div>
+
+  <!-- Upload New Image -->
+  <div class="card mt-4">
+    <div class="card-body">
+      <h6>Upload New Image</h6>
+      <form method="POST" enctype="multipart/form-data" action="{% url 'upload_product_image' product.id %}">
+        {% csrf_token %}
+        <input type="file" name="image" class="form-control" required>
+        <button type="submit" class="btn btn-success mt-2 btn-sm">Upload</button>
+      </form>
+    </div>
+  </div>
+
+</div>
+
+<!-- Bootstrap 5 JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+
+  if (urlParams.get("status") === "v_edited") {
+    Toastify({
+      text: "Product variant updated successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white",
+        color: "black",
+      },
+    }).showToast();
+  }
+
+  if (urlParams.get("status") === "I_edit") {
+    Toastify({
+      text: "Product image updated successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white",
+        color: "black",
+      },
+    }).showToast();
+  }
+
+  if (urlParams.get("status") === "v_deleted") {
+    Toastify({
+      text: "Product variant updated successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white",
+        color: "black",
+      },
+    }).showToast();
+  }
+
+  if (urlParams.get("status") === "I_delete") {
+    Toastify({
+      text: "Product image deleted successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white",
+        color: "black",
+      },
+    }).showToast();
+  }
+  // Clean up URL
+  const newUrl = window.location.origin + window.location.pathname;
+  window.history.replaceState({}, document.title, newUrl);
+</script>
+{% endblock %}

@@ -1,0 +1,106 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+
+  <!-- 🔍 Search Bar -->
+  <div class="row mb-3">
+    <div class="col-md-6 offset-md-3">
+      <input type="text" id="categorySearch" class="form-control" placeholder="Search categories...">
+    </div>
+  </div>
+
+  <!-- 🗂 Categories -->
+  <div class="row" id="categoryCards">
+    {% for category in categories %}
+      <div class="col-md-3 mb-4 category-card">
+        <div class="card shadow-sm border-0" style="border-radius: 20px; overflow: hidden;">
+          
+          <!-- 🖼 Background Image -->
+          <div class="card-img-top d-flex align-items-end justify-content-center text-white"
+               style="background-image: url('{% if category.background_img and category.background_img.url %}{{ category.background_img.url }}{% else %}/static/assets/img/placeholder.png{% endif %}');
+                      background-size: cover; background-position: center; height: 220px; position: relative;">
+            <div class="w-100 text-center" style="background: rgba(0, 0, 0, 0.4); padding: 10px;">
+              <h5 class="mb-0 font-weight-bold">{{ category.category_name }}</h5>
+            </div>
+          </div>
+
+          <!-- 🔘 Action Buttons -->
+          <div class="card-body text-center">
+            <button class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#editModal{{ category.id }}">Edit</button>
+            <a href="{% url 'delete_category' category.id %}" 
+               class="btn btn-sm btn-danger" 
+               onclick="return confirm('Deleting category may also delete all products related. Are you sure you want to delete?');">Delete</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 📝 Edit Modal -->
+      <div class="modal fade" id="editModal{{ category.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ category.id }}" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <form method="POST" enctype="multipart/form-data" action="{% url 'edit_category' category.id %}">
+            {% csrf_token %}
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="editModalLabel{{ category.id }}">Edit Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group">
+                  <label>Category Name</label>
+                  <input type="text" name="category_name" class="form-control" value="{{ category.category_name }}" required>
+                </div>
+                <div class="form-group">
+                  <label>Background Image</label>
+                  <input type="file" name="background_img" class="form-control-file">
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="submit" class="btn btn-success">Save Changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- 🔍 JS Filter Script -->
+<script>
+  document.getElementById("categorySearch").addEventListener("keyup", function () {
+    const filter = this.value.toLowerCase();
+    const cards = document.querySelectorAll(".category-card");
+
+    cards.forEach(function (card) {
+      const name = card.querySelector("h5").textContent.toLowerCase();
+      card.style.display = name.includes(filter) ? "block" : "none";
+    });
+  });
+</script>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get("status") === "deleted") {
+    Toastify({
+      text: "Category deleted successfully!",
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: "white", // Light green to white gradient
+        color: "black", // Text color black
+      },
+    }).showToast();
+
+    // Remove "status=success" from the URL
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+</script>
+{% endblock %}

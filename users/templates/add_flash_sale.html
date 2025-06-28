@@ -1,0 +1,160 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+  <div class="row">
+    <div class="col-lg-12 mb-4">
+      <div class="card">
+        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary">Add Flash Sale</h6>
+        </div>
+        <div class="card-body">
+          <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Flash Sale Name</label>
+                <input type="text" name="name" class="form-control" required placeholder="Enter flash sale name">
+              </div>
+              <div class="col-md-6 form-group mb-3">
+                <label>Tagline</label>
+                <input type="text" name="tagline" class="form-control" required placeholder="Tag line (optional)">
+              </div>
+             
+            </div>
+
+            <div class="row">
+                 
+              <div class="col-md-6 form-group mb-3">
+                <label>Start Time</label>
+                <input type="datetime-local" name="start_time" id="start_time" class="form-control" required>
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label>End Time</label>
+                <input type="datetime-local" name="end_time" id="end_time" class="form-control" required>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Discount Percentage (%)</label>
+                <input type="number" name="discount_percentage" class="form-control" required min="1" max="100"
+                  placeholder="e.g. 10 for 10% off">
+              </div>
+              <div class="col-md-6 form-group mb-3">
+              <label>Background Image</label>
+              <input type="file" name="background_image" class="form-control" accept="image/*" required>
+            </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 form-group mb-3">
+                <label>Apply To</label>
+                <select class="form-control" name="apply_type" id="applyType" required>
+                  <option value="">-- Select --</option>
+                  <option value="category">Specific Categories</option>
+                  <option value="product">Specific Products</option>
+                </select>
+              </div>
+
+              <div class="col-md-6 form-group mb-3">
+                <label>Status</label>
+                <select name="is_active" class="form-control">
+                  <option value="1" selected>Active</option>
+                  <option value="0">Inactive</option>
+                </select>
+              </div>
+            </div>
+<!-- Category Selection -->
+<div class="form-group mb-3 d-none" id="categorySelect">
+  <label>Select Categories</label>
+  <input type="text" class="form-control mb-2" placeholder="Search categories..." onkeyup="filterCheckboxes(this, 'category-options')">
+  <div id="category-options" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+    {% for category in categories %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="categories" value="{{ category.id }}" id="cat{{ category.id }}">
+        <label class="form-check-label" for="cat{{ category.id }}">{{ category.category_name }}</label>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Product Selection -->
+<div class="form-group mb-3 d-none" id="productSelect">
+  <label>Select Products</label>
+  <input type="text" class="form-control mb-2" placeholder="Search products..." onkeyup="filterCheckboxes(this, 'product-options')">
+  <div id="product-options" class="border rounded p-2" style="max-height: 200px; overflow-y: auto;">
+    {% for product in products %}
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="products" value="{{ product.id }}" id="prod{{ product.id }}">
+        <label class="form-check-label" for="prod{{ product.id }}">{{ product.display_name }}</label>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+
+
+
+            <div class="form-group mb-3">
+              <button type="submit" class="btn btn-primary">Create Flash Sale</button>
+              <a href="{% url 'flash_sale' %}" class="btn btn-secondary">Cancel</a>
+            </div> 
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Before </body> -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+  document.getElementById("applyType").addEventListener("change", function () {
+    document.getElementById("categorySelect").classList.add("d-none");
+    document.getElementById("productSelect").classList.add("d-none");
+
+    if (this.value === "category") {
+      document.getElementById("categorySelect").classList.remove("d-none");
+    } else if (this.value === "product") {
+      document.getElementById("productSelect").classList.remove("d-none");
+    }
+  });
+</script>
+<script>
+  // Toggle product/category select visibility
+  document.getElementById("applyType").addEventListener("change", function () {
+    document.getElementById("categorySelect").classList.add("d-none");
+    document.getElementById("productSelect").classList.add("d-none");
+
+    if (this.value === "category") {
+      document.getElementById("categorySelect").classList.remove("d-none");
+    } else if (this.value === "product") {
+      document.getElementById("productSelect").classList.remove("d-none");
+    }
+  });
+
+  // Filter function
+  function filterCheckboxes(inputElement, containerId) {
+    const filter = inputElement.value.toLowerCase();
+    const checkboxes = document.querySelectorAll(`#${containerId} .form-check`);
+
+    checkboxes.forEach(box => {
+      const label = box.querySelector("label").innerText.toLowerCase();
+      box.style.display = label.includes(filter) ? '' : 'none';
+    });
+  }
+</script>
+
+<!-- past time -->
+<script>
+  const now = new Date();
+  now.setMinutes(now.getMinutes() - now.getTimezoneOffset()); // adjust to local timezone
+  const minDateTime = now.toISOString().slice(0,16); // e.g. "2025-05-21T14:30"
+  
+  document.getElementById('start_time').min = minDateTime;
+  document.getElementById('end_time').min = minDateTime;
+</script>
+
+{% endblock %}

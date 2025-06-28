@@ -1,0 +1,20 @@
+{% extends 'admin_base.html' %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+<div class="container mt-5">
+  <h4>Add Images for {{ product.display_name }}</h4>
+  
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+    
+    <div class="form-group">
+      <label for="images">Select Images</label>
+      <input type="file" class="form-control" id="images" name="images" multiple required>
+      <!-- Notice: 'multiple' allows selecting many images -->
+    </div>
+    
+    <button type="submit" class="btn btn-primary mt-3">Upload Images</button>
+  </form>
+</div>
+</div>
+{% endblock %}

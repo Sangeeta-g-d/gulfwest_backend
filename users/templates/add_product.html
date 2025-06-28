@@ -1,0 +1,191 @@
+{% extends 'admin_base.html' %}
+
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <!-- Product Details Form -->
+            <div class="card mb-4">
+  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-0 font-weight-bold text-primary">Add Product Details</h6>
+  </div>
+  <div class="card-body">
+    <form method="POST" action="{% url 'add_product' %}" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="display_name">Display Name</label>
+          <input type="text" name="display_name" class="form-control" id="display_name"
+            value="{{ form_data.display_name|default_if_none:'' }}" required placeholder="e.g., Basmati Rice">
+        </div>
+
+        <div class="form-group col-md-6">
+          <label for="category">Category</label>
+          <select name="category" class="form-control" required>
+            <option value="">Select Category</option>
+            {% for category in categories %}
+              <option value="{{ category.id }}"
+                {% if form_data.category == category.id|stringformat:"s" %}selected{% endif %}>
+                {{ category.category_name }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-6">
+          <label for="SAP_code">SAP Code</label>
+          <input type="text" name="SAP_code" class="form-control"
+            value="{{ form_data.SAP_code|default_if_none:'' }}" required placeholder="e.g., SAP12345">
+        </div>
+
+        <div class="form-group col-md-6">
+          <label for="brand_name">Brand Name (optional)</label>
+          <input type="text" name="brand_name" class="form-control"
+            value="{{ form_data.brand_name|default_if_none:'' }}" placeholder="e.g., India Gate">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group col-md-4">
+          <label for="calories">Calories (optional)</label>
+          <input type="text" name="calories" class="form-control"
+            value="{{ form_data.calories|default_if_none:'' }}" placeholder="e.g., 130 kcal">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="water">Water (optional)</label>
+          <input type="text" name="water" class="form-control"
+            value="{{ form_data.water|default_if_none:'' }}" placeholder="e.g., 10%">
+        </div>
+        <div class="form-group col-md-4">
+          <label for="carbs">Carbs (optional)</label>
+          <input type="text" name="carbs" class="form-control"
+            value="{{ form_data.carbs|default_if_none:'' }}" placeholder="e.g., 28g">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description</label>
+        <textarea name="description" class="form-control" rows="3"
+          placeholder="e.g., Premium quality long grain rice.">{{ form_data.description|default_if_none:'' }}</textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="product_images">Product Images (multiple allowed)</label>
+        <input type="file" name="product_images" id="product_images" class="form-control" multiple>
+      </div>
+
+      <div class="form-check">
+        <input type="checkbox" name="is_active" class="form-check-input" id="is_active"
+          {% if form_data.is_active %}checked{% endif %}>
+        <label class="form-check-label" for="is_active">Active</label>
+      </div>
+
+      <button type="submit" class="btn btn-primary mt-3">Save Product</button>
+    </form>
+  </div>
+</div>
+
+
+            <!-- Product Variant Form -->
+            <div class="card mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-success">Add Variant for Any Product</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'add_product' %}">
+                        {% csrf_token %}
+                        <div class="form-group">
+                        <label for="product">Select Product</label>
+                        <select name="product" class="form-control select2-product" required>
+                            <option value="">-- Choose Product --</option>
+                            {% for product in products %}
+                            <option value="{{ product.id }}">{{ product.display_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="price">Price</label>
+                                <input type="number" step="0.01" name="price" class="form-control" required placeholder="e.g., 100.00">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="discount_price">Discount Price</label>
+                                <input type="number" step="0.01" name="discount_price" class="form-control" placeholder="e.g., 90.00">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="selling_quantity">Selling Quantity</label>
+                                <input type="number" step="0.01" name="selling_quantity" class="form-control" required placeholder="e.g., 1">
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="selling_unit">Selling Unit</label>
+                                <select name="selling_unit" class="form-control" required>
+                                    <option value="">Select Unit</option>
+                                    {% for unit in units %}
+                                    <option value="{{ unit.id }}">{{ unit.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success mt-3">Add Variant</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<script>
+  const status = "{{ status|default:''|escapejs }}";
+
+  console.log("Status:", status); // debug
+
+  function showToast(text, bgColor, textColor) {
+    Toastify({
+      text: text,
+      duration: 3000,
+      close: true,
+      gravity: "top",
+      position: "center",
+      style: {
+        background: bgColor,
+        color: textColor,
+      },
+    }).showToast();
+  }
+
+  if (status === "fail") {
+    showToast("Failed to add product details!", "linear-gradient(to right, #ffffff, #ed9a85)", "black");
+  } else if (status === "SAP_exists") {
+    showToast("Product with the given SAP code already exists!", "white", "black");
+  } else if (status === "variant_added") {
+    showToast("Product variant added successfully!", "white", "black");
+    cleanUrl();
+  } else if (status === "true") {
+    showToast("Product added successfully!", "white", "black");
+    cleanUrl();
+  }
+
+  function cleanUrl() {
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+</script>
+
+
+
+<script>
+    $(document).ready(function() {
+        $('.select2-product').select2({
+            placeholder: "Search and select a product",
+            allowClear: true
+        });
+    });
+</script>
+
+{% endblock %}
