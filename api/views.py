@@ -300,3 +300,21 @@ class AddOrUpdateProductRatingView(APIView):
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ProductSearchAPIView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        query = request.GET.get('q', '')
+
+        products = Product.objects.filter(
+            Q(display_name__icontains=query) |
+            Q(brand_name__icontains=query) |
+            Q(SAP_code__icontains=query),
+            is_active=True,
+            deleted=False
+        )
+
+        serializer = ProductDetailSerializer(products, many=True, context={'request': request})
+        return Response(serializer.data)

@@ -20,6 +20,7 @@ urlpatterns = [
    path('favorite_products/',FavoriteProductListAPIView.as_view(),name="fav-products"),
    path('best-selling-products/', BestSellingProductsAPIView.as_view(), name='best-selling-products'),
    path('rate-product/', AddOrUpdateProductRatingView.as_view(), name='product-rate'),
+   path('search-products/', ProductSearchAPIView.as_view(), name='product_search'),
 
 ]
 

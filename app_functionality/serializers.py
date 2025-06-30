@@ -254,11 +254,8 @@ class FlashSaleSerializer(serializers.ModelSerializer):
             return ProductWithFirstVariantSerializer(products_qs, many=True, context=self.context).data
         return []  # don’t include product details if sale is on categories
 
-
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
-        fields = ['email', 'phone_number', 'name']
+        fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile']
         read_only_fields = ['email', 'phone_number']
-    
-        

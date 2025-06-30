@@ -411,13 +411,20 @@ class ApplyCouponAPIView(APIView):
             "new_total": float(round(new_total, 2)),
         }, status=status.HTTP_200_OK)
     
-
 class UserProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data)
+
+    def put(self, request):
+        serializer = UserProfileSerializer(request.user, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({'message': 'Profile updated successfully', 'data': serializer.data})
+        return Response(serializer.errors, status=400)
+
     
 class UserOrderHistoryAPIView(generics.ListAPIView):
     serializer_class = OrderHistorySerializer

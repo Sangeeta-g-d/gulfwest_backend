@@ -36,33 +36,36 @@ class CustomUserManager(BaseUserManager):
 
         return self.create_user(email=email, password=password, **extra_fields)
 
-
 class CustomUser(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=15, unique=True, null=True, blank=True)
 
     name = models.CharField(max_length=255, blank=True, null=True)
-    dob = models.DateField(null=True, blank=True)
+    dob = models.DateField(null=True, blank=True)  # Already exists
+    gender = models.CharField(max_length=10, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')], null=True, blank=True)
+
     zone = models.CharField(max_length=100, null=True, blank=True)
-    area = models.CharField(max_length=100,null=True, blank=True)
+    area = models.CharField(max_length=100, null=True, blank=True)
     role = models.CharField(max_length=20, default='customer')
     flag = models.BooleanField(default=False)
     city = models.CharField(max_length=200, null=True, blank=True)
+
     is_phone_verified = models.BooleanField(default=False)
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     profile = models.ImageField(upload_to='profile/', blank=True, null=True)
 
-    
     objects = CustomUserManager()
 
-    USERNAME_FIELD = 'email'  # Keep this for compatibility with Django admin or use 'phone_number'
+    USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
     def __str__(self):
         return self.email if self.email else self.phone_number
+
 
 
 class Role(models.Model):
