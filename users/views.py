@@ -212,7 +212,7 @@ def toggle_approval(request, id):
     user.save()
     return redirect('customers')
 
-
+@login_required(login_url='/login/')
 def delete_user(request, user_id):
     try:
         user = get_object_or_404(CustomUser, id=user_id)
@@ -221,6 +221,7 @@ def delete_user(request, user_id):
     except:
         return redirect('/customers/?status=delete_failed')
     
+@login_required(login_url='/login/')
 def add_category(request):
     if request.method == "POST":
         category_name = request.POST.get('category')
@@ -232,7 +233,7 @@ def add_category(request):
             return JsonResponse({'status': 'error', 'message': 'Category name cannot be empty'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
-
+@login_required(login_url='/login/')
 def category_list(request):
     categories = Categories.objects.order_by('-id')
     context = {
@@ -241,6 +242,7 @@ def category_list(request):
     }
     return render(request,'category_list.html',context)
 
+@login_required(login_url='/login/')
 def edit_category(request, category_id):
     category = get_object_or_404(Categories, id=category_id)
     if request.method == 'POST':
@@ -251,6 +253,7 @@ def edit_category(request, category_id):
         return redirect('/category_list')  # replace with your actual category list URL name
     return redirect('/category_list')
 
+@login_required(login_url='/login/')
 def add_unit(request):
     if request.method == "POST":
         name = request.POST.get('name')
@@ -273,7 +276,7 @@ def add_unit(request):
 
     return JsonResponse({'status': 'error', 'message': 'Invalid request'})
 
-
+@login_required(login_url='/login/')
 def staff_details(request):
     staff_list = Staff.objects.select_related('user').all()  # Efficiently fetch related user
     context = {
@@ -282,6 +285,7 @@ def staff_details(request):
     }
     return render(request, 'staff_details.html', context)
 
+@login_required(login_url='/login/')
 def add_staff(request):
     roles = Role.objects.all()
 
@@ -328,7 +332,7 @@ def add_staff(request):
 
     return render(request, 'add_staff.html', {'roles': roles, 'current_url_name': 'staff'})
 
-
+@login_required(login_url='/login/')
 def edit_staff_details(request, staff_id):
     staff = get_object_or_404(Staff, id=staff_id)
     user = staff.user
@@ -366,6 +370,7 @@ def edit_staff_details(request, staff_id):
     }
     return render(request, 'edit_staff_details.html', context)
 
+@login_required(login_url='/login/')
 def delete_staff(request, staff_id):
     staff = get_object_or_404(Staff, id=staff_id)
     user = staff.user
@@ -373,7 +378,7 @@ def delete_staff(request, staff_id):
     user.delete()  # Optional: remove the associated user too
     return redirect('/staff_details/?status=deleted')
 
-
+@login_required(login_url='/login/')
 def products(request):
     categories = Categories.objects.all()
     print(categories)
@@ -383,12 +388,13 @@ def products(request):
     }
     return render(request,'products.html',context)
 
-
+@login_required(login_url='/login/')
 def delete_category(request, category_id):
     category = get_object_or_404(Categories, id=category_id)
     category.delete()
     return redirect('/category_list/?status=deleted')
 
+@login_required(login_url='/login/')
 def add_product_and_variant(request):
     status = request.GET.get('status', '')
     categories = Categories.objects.all()
@@ -474,6 +480,7 @@ def add_product_and_variant(request):
         'status': status,
     })
 
+@login_required(login_url='/login/')
 def add_images(request, product_id):
     product = get_object_or_404(Product, id=product_id)
 
@@ -485,7 +492,7 @@ def add_images(request, product_id):
 
     return render(request, 'add_images.html', {'product': product})
 
-
+@login_required(login_url='/login/')
 def view_products(request):
       # Latest first
     search_query = request.GET.get('search', '')  # Get search text
@@ -515,6 +522,8 @@ def view_products(request):
     }
     return render(request, 'view_products.html', context)
 
+
+@login_required(login_url='/login/')
 def product_details(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     images = ProductImage.objects.filter(product=product)
@@ -534,6 +543,7 @@ def product_details(request, product_id):
     }
     return render(request, 'product_details.html', context)
 
+@login_required(login_url='/login/')
 def edit_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     images = ProductImage.objects.filter(product=product)
@@ -582,6 +592,7 @@ def edit_product(request, product_id):
         'current_url_name': "products"
     })
     
+@login_required(login_url='/login/')
 def edit_variant(request, variant_id):
     variant = get_object_or_404(ProductVariant, id=variant_id)
 
@@ -602,6 +613,7 @@ def edit_variant(request, variant_id):
 
     return redirect(f'/edit_product/{variant.product.id}/?status=v_edited')
 
+@login_required(login_url='/login/')
 def edit_product_image(request, image_id):
     image = get_object_or_404(ProductImage, id=image_id)
     if request.method == 'POST':
@@ -612,6 +624,7 @@ def edit_product_image(request, image_id):
             return redirect(f'/edit_product/{image.product.id}/?status=I_edit')
     return render(request, 'edit_product_image.html', {'image': image}) 
 
+@login_required(login_url='/login/')
 def add_role(request):
     if request.method == 'POST':
         role_name = request.POST.get('name')
@@ -623,32 +636,34 @@ def add_role(request):
     # Fallback redirect with status=false (optional)
     return redirect(f"{reverse('add_staff')}?status=false")
 
-
+@login_required(login_url='/login/')
 def delete_variant(request, variant_id):
     variant = get_object_or_404(ProductVariant, id=variant_id)
     product_id = variant.product.id
     variant.delete()
     return redirect(f'/edit_product/{product_id}/?status=v_deleted')
 
-
+@login_required(login_url='/login/')
 def delete_product_image(request, image_id):
     image = get_object_or_404(ProductImage, id=image_id)
     product_id = image.product.id
     image.delete()
     return redirect(f'/edit_product/{product_id}/?status=I_delete')
    
+@login_required(login_url='/login/')
 def upload_product_image(request, product_id):
     if request.method == 'POST' and request.FILES.get('image'):
         product = get_object_or_404(Product, id=product_id)
         ProductImage.objects.create(product=product, image=request.FILES['image'])
         return redirect('edit_product', product_id=product_id)
     
-    
+@login_required(login_url='/login/')
 def delete_product(request, product_id):
     product = get_object_or_404(Product, id=product_id)
     product.delete()
     return redirect('/view_products/?deleted=true')
 
+@login_required(login_url='/login/')
 def add_flash_sale(request):
     categories = Categories.objects.all()
     products = Product.objects.all()
@@ -706,12 +721,14 @@ def add_flash_sale(request):
     })
 
 
+@login_required(login_url='/login/')
 def flash_sale(request):
     flash_sales = FlashSale.objects.all().order_by('-start_time')
     return render(request, 'flash_sale.html', {
         'flash_sales': flash_sales,'current_url_name':"flash_sale"
     })
 
+@login_required(login_url='/login/')
 def edit_flash_sale(request, sale_id):
     sale = get_object_or_404(FlashSale, id=sale_id)
     ist = pytz.timezone('Asia/Kolkata')
@@ -776,11 +793,14 @@ def edit_flash_sale(request, sale_id):
     })
 
 
+@login_required(login_url='/login/')
 def delete_flash_sale(request, sale_id):
     sale = get_object_or_404(FlashSale, id=sale_id)
     sale.delete()
     return redirect('/flash_sale')
 
+
+@login_required(login_url='/login/')
 def driver(request):
     driver_users = CustomUser.objects.filter(role='driver')  # Filter only drivers
 
@@ -790,6 +810,7 @@ def driver(request):
     }
     return render(request, 'driver.html', context)
 
+@login_required(login_url='/login/')
 def add_driver(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
@@ -827,7 +848,7 @@ def add_driver(request):
     }
     return render(request, 'add_driver.html', context)
 
-
+@login_required(login_url='/login/')
 def edit_driver(request, driver_id):
     driver = get_object_or_404(CustomUser, id=driver_id, role='driver')
 
@@ -849,12 +870,13 @@ def edit_driver(request, driver_id):
     }
     return render(request, 'edit_driver.html', context)
 
-
+@login_required(login_url='/login/')
 def delete_driver(request, driver_id):
     driver = get_object_or_404(CustomUser, id=driver_id, role='driver')
     driver.delete()
     return redirect('/driver/?status=deleted')
 
+@login_required(login_url='/login/')
 def orders(request):
     search_query = request.GET.get('search', '').strip()
     status_filter = request.GET.get('status', '').strip()
@@ -927,6 +949,7 @@ def delete_order(request, order_id):
     order.delete()
     return redirect('/orders/?status=deleted')
 
+@login_required(login_url='/login/')
 def assign_driver_to_order(request, order_id):
     if request.method == 'POST':
         driver_id = request.POST.get('driver_id')
@@ -946,6 +969,7 @@ def assign_driver_to_order(request, order_id):
     # Redirect back to orders page without invalid filter
     return redirect('/orders/')
 
+@login_required(login_url='/login/')
 def promo_code(request):
     promos = PromoCode.objects.all().order_by('-created_at')
     context = {
@@ -954,6 +978,7 @@ def promo_code(request):
     }
     return render(request, 'promo_code.html',context)
 
+@login_required(login_url='/login/')
 def add_promo_code(request):
     if request.method == 'POST':
         code = request.POST.get('code')
@@ -996,7 +1021,7 @@ def add_promo_code(request):
 
     return render(request, 'add_promo_code.html')
 
-
+@login_required(login_url='/login/')
 def edit_promo_code(request, promo_id):
     promo = get_object_or_404(PromoCode, id=promo_id)
 
@@ -1046,7 +1071,7 @@ def promo_usage_chart(request):
 
 
 # staff related code
-@login_required
+@login_required(login_url='/login/')
 def staff_dashboard(request):
     total_orders = Order.objects.count()
     delivered_orders = Order.objects.filter(status='delivered').count()
@@ -1078,6 +1103,7 @@ def staff_dashboard(request):
     }
     return render(request, 'staff_dashboard.html', context)
 
+@login_required(login_url='/login/')
 def onboarding_images(request):
     if request.method == 'POST' and request.FILES.get('image'):
         OnboardingImage.objects.create(image=request.FILES['image'])
@@ -1089,3 +1115,10 @@ def onboarding_images(request):
         "images": images
     }
     return render(request, 'onboarding_images.html', context)
+
+@login_required(login_url='/login/')
+def delete_onboarding_image(request, pk):
+    image = get_object_or_404(OnboardingImage, pk=pk)
+    image.image.delete()  # delete file from storage
+    image.delete()        # delete database entry
+    return redirect('/onboarding-images/?status=deleted')

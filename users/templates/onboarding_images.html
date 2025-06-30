@@ -1,6 +1,22 @@
 {% extends 'admin_base.html' %}
-{% load static %}
 {% block content %}
+<style>
+  .image-card .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .image-card:hover .overlay {
+    opacity: 1;
+  }
+</style>
+
 <div class="container-fluid" id="container-wrapper">
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h3 class="mb-0">Onboarding Images</h3>
@@ -11,13 +27,20 @@
   <div class="row">
     {% for img in images %}
     <div class="col-md-3 mb-3">
-      <div class="card">
-        <img src="{{ img.image.url }}" class="card-img-top" alt="Onboarding Image">
-        <div class="card-body text-center">
-          <small class="text-muted">Uploaded at {{ img.uploaded_at|date:"Y-m-d H:i" }}</small>
-        </div>
-      </div>
+  <div class="card image-card position-relative" style="overflow: hidden;">
+    <img src="{{ img.image.url }}" class="card-img-top" alt="Onboarding Image" style="height: 400px; object-fit: cover;">
+    <div class="overlay d-flex justify-content-center align-items-center">
+      <form method="POST" action="{% url 'delete_onboarding_image' img.id %}" onsubmit="return confirm('Are you sure you want to delete this image?');">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+      </form>
     </div>
+    <div class="card-body text-center">
+      <small class="text-muted">Uploaded at {{ img.uploaded_at|date:"Y-m-d H:i" }}</small>
+    </div>
+  </div>
+</div>
+
     {% empty %}
     <p style="margin-left: 20px;">No onboarding images found.</p>
     {% endfor %}
@@ -53,16 +76,19 @@
   const urlParams = new URLSearchParams(window.location.search);
   const status = urlParams.get("status");
 
-  if (status === "success") {
-    Toastify({
-      text: "Image uploaded successfully!",
-      duration: 3000,
-      gravity: "top",
-      position: "center",
-      backgroundColor: "#28a745",
-      close: true,
-    }).showToast();
-  }
+ if (status === "success" || status === "deleted") {
+  Toastify({
+    text: status === "success" ? "Image uploaded successfully!" : "Image deleted successfully!",
+    duration: 3000,
+    gravity: "top",
+    position: "center",
+    style: {
+      background: "white",
+      color: "black",
+    },
+    close: true,
+  }).showToast();
+}
 
   // Remove query param from URL without reloading the page
   if (status) {
