@@ -17,28 +17,35 @@
               </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-hover">
-                  <thead class="thead-light">
-                    <tr>
-                      <th>ID</th>
-                     
-                      <th>Email</th>
-                      <th>Phone number</th>
-                      <th>DOB</th>
-                      <th>City</th>
-                      <th>Verified</th>
-                      
-                    </tr>
-                  </thead>
-                 <tbody>
+                 <thead class="thead-light">
+  <tr>
+    <th>ID</th>
+    <th>Profile</th>
+    <th>Email</th>
+    <th>Phone number</th>
+    <th>DOB</th>
+    <th>Zone</th>
+    <th>Area</th>
+    <th>Verified</th>
+  </tr>
+</thead>
+<tbody>
   {% if details %}
     {% for x in details %}
     <tr>
       <td>{{ x.id }}</td>
-      
+      <td>
+        {% if x.profile %}
+          <img src="{{ x.profile.url }}" alt="Profile" class="rounded-circle" width="40" height="40" style="object-fit: cover;">
+        {% else %}
+          <span class="text-muted">No Image</span>
+        {% endif %}
+      </td>
       <td>{{ x.email }}</td>
       <td>{{ x.phone_number }}</td>
       <td>{{ x.dob }}</td>
-      <td>{{ x.city }}</td>
+      <td>{{ x.zone|default:"—" }}</td>
+      <td>{{ x.area|default:"—" }}</td>
       <td>
         {% if x.flag %}
           <span class="badge badge-success">Approved</span>
@@ -54,6 +61,7 @@
     </tr>
   {% endif %}
 </tbody>
+
 
                 </table>
               </div>
