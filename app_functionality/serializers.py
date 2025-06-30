@@ -252,16 +252,20 @@ class FlashSaleSerializer(serializers.ModelSerializer):
             return ProductWithFirstVariantSerializer(products_qs, many=True, context=self.context).data
         return []  # don’t include product details if sale is on categories
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    profile = serializers.SerializerMethodField()
 
+class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = CustomUser
         fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile']
         read_only_fields = ['email', 'phone_number']
 
-    def get_profile(self, obj):
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
         request = self.context.get('request')
-        if obj.profile and hasattr(obj.profile, 'url'):
-            return request.build_absolute_uri(obj.profile.url)
-        return None
+
+        if instance.profile and hasattr(instance.profile, 'url') and request:
+            rep['profile'] = request.build_absolute_uri(instance.profile.url)
+        else:
+            rep['profile'] = None
+
+        return rep
