@@ -367,8 +367,11 @@ class ProductSimpleSerializer(serializers.ModelSerializer):
         fields = ['id', 'display_name', 'image', 'price', 'effective_price']
 
     def get_image(self, obj):
+        request = self.context.get('request')
         first_image = obj.images.first()
-        return first_image.image.url if first_image else None
+        if first_image and first_image.image:
+            return request.build_absolute_uri(first_image.image.url) if request else first_image.image.url
+        return None
 
     def get_variant(self, obj):
         return obj.variants.first()
@@ -382,6 +385,7 @@ class ProductSimpleSerializer(serializers.ModelSerializer):
         if not variant:
             return 0.0
         return float(variant.discount_price) if variant.discount_price else float(variant.price)
+
 
 class ProductRatingSerializer(serializers.ModelSerializer):
     class Meta:
