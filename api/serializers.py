@@ -370,7 +370,10 @@ class ProductSimpleSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         first_image = obj.images.first()
         if first_image and first_image.image:
-            return request.build_absolute_uri(first_image.image.url) if request else first_image.image.url
+            if request:
+                # This will build the absolute URL including scheme and domain
+                return request.build_absolute_uri(first_image.image.url)
+            return first_image.image.url
         return None
 
     def get_variant(self, obj):
