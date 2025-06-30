@@ -489,7 +489,6 @@ class ActiveFlashSaleAPIView(APIView):
         serializer = FlashSaleSerializer(active_sales, many=True, context={'request': request})
         return Response(serializer.data)
     
-
 class UserProfileAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -503,6 +502,7 @@ class UserProfileAPIView(APIView):
             serializer.save()
             return Response({"message": "Profile updated successfully", "data": serializer.data}, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     
 class ReorderAPIView(APIView):
     permission_classes = [IsAuthenticated]
