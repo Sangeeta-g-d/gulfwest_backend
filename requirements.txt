@@ -10,7 +10,7 @@ certifi==2025.4.26
 cffi==1.17.1
 charset-normalizer==3.4.2
 contourpy==1.3.2
-cryptography==44.0.3d
+cryptography==44.0.3
 cycler==0.12.1
 Django==5.2.1
 django-cors-headers==4.7.0

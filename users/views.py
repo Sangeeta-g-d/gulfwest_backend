@@ -225,13 +225,13 @@ def add_category(request):
     if request.method == "POST":
         category_name = request.POST.get('category')
         background_img = request.FILES.get('background_img')
-        print(category_name)
         if category_name:
-            Categories.objects.create(category_name=category_name,background_img=background_img)
+            Categories.objects.create(category_name=category_name, background_img=background_img)
             return JsonResponse({'status': 'success', 'message': 'Category added successfully'})
         else:
             return JsonResponse({'status': 'error', 'message': 'Category name cannot be empty'})
-    return JsonResponse({'status': 'error', 'message': 'Invalid request'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
 
 
 def category_list(request):

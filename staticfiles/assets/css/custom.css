@@ -1,0 +1,26 @@
+.upload-card {
+    border: 2px dashed #dee2e6;
+    position: relative;
+    height: 180px;  /* Set consistent height */
+    width: 180px;   /* Set consistent width */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.upload-card img,
+.upload-card .placeholder {
+    object-fit: cover;
+    height: 100%;   /* Ensure image or placeholder takes up full height */
+    width: 100%;    /* Ensure image or placeholder takes up full width */
+    position: absolute; /* Position both image and placeholder absolutely within the container */
+}
+
+.upload-card .placeholder {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #aaa;
+}

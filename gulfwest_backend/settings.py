@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-2ud5tt_h_9#+g_acca%tcz6_kyio0#06&q$w%i8*u7oc4wl6n0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['147.93.27.106']
 
 
 from dotenv import load_dotenv
@@ -103,9 +103,9 @@ CSRF_TRUSTED_ORIGINS = [
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
-    'http://192.168.183.220:8000',  # Add your device's IP and port
+     # Add your device's IP and port
     'http://localhost:8000',  # Local development on localhost (if needed)
-    'http://127.0.0.1:8000',  # Localhost on your development machine (if needed)
+    'http://147.93.27.106',  # Localhost on your development machine (if needed)
 ]
 
 
@@ -152,7 +152,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'gulfwest',  # Replace with your database name
         'USER': 'postgres',  # Your PostgreSQL username
-        'PASSWORD': 'new_password',  # Your PostgreSQL password
+        'PASSWORD': 'GulfWest',  # Your PostgreSQL password
         'HOST': 'localhost',
         'PORT': '5432',
     }
