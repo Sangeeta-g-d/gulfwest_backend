@@ -323,59 +323,85 @@
 </div>
 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- add category script -->
-  <script>
-    $(document).ready(function () {
-      $('#addCategoryForm').submit(function (e) {
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== "") {
+        const cookies = document.cookie.split(";");
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + "=") {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+$(document).ready(function () {
+    $('#addCategoryForm').submit(function (e) {
         e.preventDefault();  // Prevent default form submission
-  
+
         const formData = new FormData(this);
-        console.log(formData.get('category'));
+
         fetch("{% url 'add_category' %}", {
-          method: "POST",
-          headers: {
-            "X-CSRFToken": '{{ csrf_token }}'
-          },
-          body: formData
+            method: "POST",
+            headers: {
+                "X-CSRFToken": getCookie('csrftoken')
+            },
+            body: formData
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-          // Close modal
-          var modal = bootstrap.Modal.getInstance(document.getElementById('addCategoryModal'));
-          modal.hide();
-  
-          // Clear input
-          $('#category').val('');
-  
-          // Show Toast
-          Toastify({
-            text: data.message,
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            style: {
-        background: "linear-gradient(to right, #ffffff, #c3e6cb)", // Light green to white gradient
-        color: "black", // Text color black
-    },
-            stopOnFocus: true
-          }).showToast();
-  
-          // Optional: Reload or update list dynamically
-          // location.reload();
+            if (data.status === 'success') {
+                // ✅ For Bootstrap 4
+                $('#addCategoryModal').modal('hide');
+
+                $('#category').val('');
+                $('#img').val('');
+
+                Toastify({
+                    text: data.message,
+                    duration: 3000,
+                    gravity: "top",
+                    position: "center",
+                    style: {
+                        background: "linear-gradient(to right, #ffffff, #c3e6cb)",
+                        color: "black"
+                    },
+                    stopOnFocus: true
+                }).showToast();
+            } else {
+                Toastify({
+                    text: data.message || "Something went wrong.",
+                    duration: 3000,
+                    gravity: "top",
+                    position: "center",
+                    backgroundColor: "#dc3545"
+                }).showToast();
+            }
         })
         .catch(error => {
-          console.error('Error:', error);
-          Toastify({
-            text: "Something went wrong.",
-            duration: 3000,
-            gravity: "top",
-            position: "center",
-            backgroundColor: "#dc3545"
-          }).showToast();
+            console.error('Error:', error);
+            Toastify({
+                text: "Something went wrong. Check console for details.",
+                duration: 3000,
+                gravity: "top",
+                position: "center",
+                backgroundColor: "#dc3545"
+            }).showToast();
         });
-      });
     });
-  </script>
+});
+</script>
+
+
 <!-- add Unit script -->
 
 <script>
@@ -389,7 +415,7 @@
       fetch("{% url 'add_unit' %}", {
         method: "POST",
         headers: {
-          "X-CSRFToken": '{{ csrf_token }}'
+          "X-CSRFToken": getCookie('csrftoken')
         },
         body: formData
       })
