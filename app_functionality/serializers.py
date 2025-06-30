@@ -11,10 +11,8 @@ from api.serializers import ProductWithFirstVariantSerializer
 User = get_user_model()
 
 
-class UserProfileSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['id', 'name', 'email']
+
+
 
 class ProductBasicSerializer(serializers.ModelSerializer):
     class Meta:
@@ -255,7 +253,15 @@ class FlashSaleSerializer(serializers.ModelSerializer):
         return []  # don’t include product details if sale is on categories
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    profile = serializers.SerializerMethodField()
+
     class Meta:
         model = CustomUser
         fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile']
         read_only_fields = ['email', 'phone_number']
+
+    def get_profile(self, obj):
+        request = self.context.get('request')
+        if obj.profile and hasattr(obj.profile, 'url'):
+            return request.build_absolute_uri(obj.profile.url)
+        return None
