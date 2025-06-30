@@ -318,3 +318,10 @@ class ProductSearchAPIView(APIView):
 
         serializer = ProductDetailSerializer(products, many=True, context={'request': request})
         return Response(serializer.data)
+    
+
+class OnboardingImageListAPIView(APIView):
+    def get(self, request):
+        images = OnboardingImage.objects.all().order_by('-uploaded_at')
+        serializer = OnboardingImageSerializer(images, many=True, context={'request': request})
+        return Response(serializer.data)

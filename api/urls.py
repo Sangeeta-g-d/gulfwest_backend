@@ -22,5 +22,7 @@ urlpatterns = [
    path('rate-product/', AddOrUpdateProductRatingView.as_view(), name='product-rate'),
    path('search-products/', ProductSearchAPIView.as_view(), name='product_search'),
 
+   path('onboarding-images/', OnboardingImageListAPIView.as_view(), name='onboarding_images_api'),
+
 ]
 

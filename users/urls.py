@@ -65,7 +65,9 @@ urlpatterns = [
 
 
     # staff related urls
-    path('staff_dashboard/',views.staff_dashboard,name="staff_dashboard")
+    path('staff_dashboard/',views.staff_dashboard,name="staff_dashboard"),
+    
+    path('onboarding_images/',views.onboarding_images,name="onboarding_images"),
 ]
 
 

@@ -1,0 +1,73 @@
+{% extends 'admin_base.html' %}
+{% load static %}
+{% block content %}
+<div class="container-fluid" id="container-wrapper">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="mb-0">Onboarding Images</h3>
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addImageModal">+ Add Image</button>
+  </div>
+
+  <!-- Image Grid -->
+  <div class="row">
+    {% for img in images %}
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <img src="{{ img.image.url }}" class="card-img-top" alt="Onboarding Image">
+        <div class="card-body text-center">
+          <small class="text-muted">Uploaded at {{ img.uploaded_at|date:"Y-m-d H:i" }}</small>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <p style="margin-left: 20px;">No onboarding images found.</p>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- Add Image Modal -->
+<div class="modal fade" id="addImageModal" tabindex="-1" aria-labelledby="addImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form method="POST" enctype="multipart/form-data">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addImageModalLabel">Upload Onboarding Image</h5>
+          <button type="button" class="btn-close btn btn-light" data-bs-dismiss="modal" aria-label="Close">x</button>
+        </div>
+        <div class="modal-body">
+          <input type="file" name="image" class="form-control" required accept="image/*">
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Upload</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Toastify -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+<script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const status = urlParams.get("status");
+
+  if (status === "success") {
+    Toastify({
+      text: "Image uploaded successfully!",
+      duration: 3000,
+      gravity: "top",
+      position: "center",
+      backgroundColor: "#28a745",
+      close: true,
+    }).showToast();
+  }
+
+  // Remove query param from URL without reloading the page
+  if (status) {
+    const newUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, newUrl);
+  }
+</script>
+{% endblock %}

@@ -1077,3 +1077,15 @@ def staff_dashboard(request):
         "current_url_name":"staff_dashboard",
     }
     return render(request, 'staff_dashboard.html', context)
+
+def onboarding_images(request):
+    if request.method == 'POST' and request.FILES.get('image'):
+        OnboardingImage.objects.create(image=request.FILES['image'])
+        return redirect('/onboarding-images/?status=success')
+
+    images = OnboardingImage.objects.all()
+    context = {
+        "current_url_name": "onboarding_images",
+        "images": images
+    }
+    return render(request, 'onboarding_images.html', context)

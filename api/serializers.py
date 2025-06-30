@@ -410,3 +410,17 @@ class RecentProductRatingSerializer(serializers.ModelSerializer):
 
     def get_user_name(self, obj):
         return obj.user.name or obj.user.email or obj.user.phone_number
+    
+
+class OnboardingImageSerializer(serializers.ModelSerializer):
+    image_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = OnboardingImage
+        fields = ['id', 'image_url']
+
+    def get_image_url(self, obj):
+        request = self.context.get('request')
+        if obj.image and hasattr(obj.image, 'url'):
+            return request.build_absolute_uri(obj.image.url) if request else obj.image.url
+        return None

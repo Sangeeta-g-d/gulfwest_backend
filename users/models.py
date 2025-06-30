@@ -284,3 +284,11 @@ class OrderDriverAssignment(models.Model):
 
     def __str__(self):
         return f"Driver {self.driver} assigned to Order #{self.order.id}"
+    
+
+class OnboardingImage(models.Model):
+    image = models.ImageField(upload_to='onboarding/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"OnboardingImage {self.id}"
