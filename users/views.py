@@ -233,7 +233,6 @@ def add_category(request):
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
 
 
-
 def category_list(request):
     categories = Categories.objects.order_by('-id')
     context = {

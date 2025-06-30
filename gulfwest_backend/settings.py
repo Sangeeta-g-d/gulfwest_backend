@@ -147,14 +147,16 @@ AUTH_USER_MODEL = 'users.CustomUser'  # Custom user model
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+from decouple import config
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'gulfwest',  # Replace with your database name
-        'USER': 'postgres',  # Your PostgreSQL username
-        'PASSWORD': 'GulfWest',  # Your PostgreSQL password
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 
