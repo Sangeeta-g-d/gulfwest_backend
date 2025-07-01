@@ -253,7 +253,7 @@ class FlashSaleSerializer(serializers.ModelSerializer):
         return []  # don’t include product details if sale is on categories
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    profile = serializers.ImageField(required=False)
+    profile = serializers.ImageField(required=False,allow_null=True)
 
     class Meta:
         model = CustomUser
