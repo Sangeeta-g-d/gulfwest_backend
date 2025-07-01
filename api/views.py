@@ -316,7 +316,7 @@ class ProductSearchAPIView(APIView):
             deleted=False
         )
 
-        serializer = ProductDetailSerializer(products, many=True, context={'request': request})
+        serializer = ProductWithFirstVariantSerializer(products, many=True, context={'request': request})
         return Response(serializer.data)
     
 
