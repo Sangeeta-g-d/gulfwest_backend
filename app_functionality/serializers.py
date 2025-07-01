@@ -253,15 +253,19 @@ class FlashSaleSerializer(serializers.ModelSerializer):
         return []  # don’t include product details if sale is on categories
 
 class UserProfileSerializer(serializers.ModelSerializer):
-    profile = serializers.SerializerMethodField()
+    profile = serializers.ImageField(required=False)
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile','zone','area']
-        read_only_fields = ['email', 'phone_number','zone','area']
+        fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile', 'zone', 'area']
+        read_only_fields = ['email', 'phone_number', 'zone', 'area']
 
-    def get_profile(self, obj):
+    def to_representation(self, instance):
+        """Customize output to return full URL for profile image"""
+        representation = super().to_representation(instance)
         request = self.context.get('request')
-        if obj.profile:
-            return request.build_absolute_uri(obj.profile.url) if request else obj.profile.url
-        return None
+        if instance.profile and request:
+            representation['profile'] = request.build_absolute_uri(instance.profile.url)
+        elif not instance.profile:
+            representation['profile'] = None
+        return representation
