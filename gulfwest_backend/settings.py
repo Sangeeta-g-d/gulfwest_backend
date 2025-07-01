@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'app_functionality',
-    'orders'
+    'orders',
+    'django_extensions'
 ]
 
 REST_FRAMEWORK = {
