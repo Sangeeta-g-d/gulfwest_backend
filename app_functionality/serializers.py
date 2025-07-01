@@ -257,7 +257,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CustomUser
-        fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile']
+        fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile','zone','area']
         read_only_fields = ['email', 'phone_number','zone','area']
 
     def get_profile(self, obj):
