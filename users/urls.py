@@ -68,7 +68,7 @@ urlpatterns = [
     path('staff_dashboard/',views.staff_dashboard,name="staff_dashboard"),
 
     path('onboarding-images/',views.onboarding_images,name="onboarding_images"),
-    path('delete-onboarding-image/<int:pk>/', views.delete_onboarding_image, name='delete_onboarding_image'),
+    path('delete_onboarding_image/<int:pk>/', views.delete_onboarding_image, name='delete_onboarding_image'),
 ]
 
 
