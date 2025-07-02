@@ -425,23 +425,24 @@ class UserProfileAPIView(APIView):
             return Response({'message': 'Profile updated successfully', 'data': serializer.data})
         return Response(serializer.errors, status=400)
 
-    
 class UserOrderHistoryAPIView(generics.ListAPIView):
     serializer_class = OrderHistorySerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user).order_by('-placed_at')
+        return Order.objects.filter(
+            user=self.request.user,
+            is_deleted_by_user=False  # Exclude deleted orders
+        ).order_by('-placed_at')
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
-        context['request'] = self.request  # for image URLs
+        context['request'] = self.request
         return context
 
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
 
-        # Split orders by status
         active_statuses = ['pending', 'confirmed', 'shipped']
         completed_statuses = ['delivered', 'cancelled']
 
@@ -455,6 +456,7 @@ class UserOrderHistoryAPIView(generics.ListAPIView):
             "active": active_serialized,
             "completed": completed_serialized
         })
+
 
 
 class ActivePromoCodeListAPIView(generics.ListAPIView):

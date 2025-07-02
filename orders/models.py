@@ -28,7 +28,7 @@ class Order(models.Model):
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_type = models.CharField(max_length=29, choices=PAYMENT_CHOICES, default="POS")
     placed_at = models.DateTimeField(default=timezone.now)
-
+    is_deleted_by_user = models.BooleanField(default=False)  # New field
     def __str__(self):
         return f"Order #{self.id} by {self.user}"
 
