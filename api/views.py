@@ -190,7 +190,7 @@ class ProductDetailAPIView(APIView):
 
     def get(self, request, product_id):
         product = get_object_or_404(Product, id=product_id, is_active=True, deleted=False)
-        
+
         # Main product details
         serializer = ProductDetailSerializer(product, context={'request': request})
 
@@ -203,8 +203,11 @@ class ProductDetailAPIView(APIView):
 
         similar_serializer = ProductSimpleSerializer(similar_products, many=True, context={'request': request})
 
-        # Recent 6 ratings
-        recent_ratings = product.ratings.select_related('user').order_by('-created_at')[:6]
+        # Recent 5 ratings excluding current user
+        recent_ratings = product.ratings.select_related('user')\
+            .exclude(user=request.user)\
+            .order_by('?')[:5]  # randomized selection of other users
+
         rating_serializer = RecentProductRatingSerializer(recent_ratings, many=True)
 
         return Response({
