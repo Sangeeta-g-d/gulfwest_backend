@@ -7,6 +7,7 @@ from django.utils import timezone
 from django.utils.timezone import localtime
 from users.models import FlashSale
 import pytz
+from django.core.exceptions import ValidationError
 from api.serializers import ProductWithFirstVariantSerializer
 User = get_user_model()
 
@@ -252,20 +253,36 @@ class FlashSaleSerializer(serializers.ModelSerializer):
             return ProductWithFirstVariantSerializer(products_qs, many=True, context=self.context).data
         return []  # don’t include product details if sale is on categories
 
+def validate_profile_image(image):
+    max_size = 10 * 1024 * 1024  # 10MB
+    if image and image.size > max_size:
+        raise ValidationError("Image size should not exceed 10MB.")
+    return image
+
 class UserProfileSerializer(serializers.ModelSerializer):
-    profile = serializers.ImageField(required=False,allow_null=True)
+    profile = serializers.ImageField(
+        required=False,
+        allow_null=True,
+        validators=[validate_profile_image]
+    )
 
     class Meta:
         model = CustomUser
         fields = ['email', 'phone_number', 'name', 'dob', 'gender', 'profile', 'zone', 'area']
         read_only_fields = ['email', 'phone_number', 'zone', 'area']
 
+    def update(self, instance, validated_data):
+        # Handle removal of profile image if null is explicitly passed
+        if 'profile' in validated_data and validated_data['profile'] is None:
+            instance.profile.delete(save=False)
+            instance.profile = None
+        return super().update(instance, validated_data)
+
     def to_representation(self, instance):
-        """Customize output to return full URL for profile image"""
         representation = super().to_representation(instance)
         request = self.context.get('request')
         if instance.profile and request:
             representation['profile'] = request.build_absolute_uri(instance.profile.url)
-        elif not instance.profile:
+        else:
             representation['profile'] = None
         return representation

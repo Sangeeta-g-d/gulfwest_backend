@@ -64,6 +64,9 @@ REST_FRAMEWORK = {
     ),
 }
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # Optional, for raw POST body
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
 
 from datetime import timedelta
 
