@@ -810,6 +810,7 @@ def driver(request):
     }
     return render(request, 'driver.html', context)
 
+
 @login_required(login_url='/login/')
 def add_driver(request):
     if request.method == 'POST':
@@ -818,35 +819,30 @@ def add_driver(request):
         phone_number = request.POST.get('phone_number')
         profile = request.FILES.get('profile')
 
-        # Check for existing email
+        # Check for duplicate email
         if CustomUser.objects.filter(email=email).exists():
             return redirect('/add_driver/?status=email_exists')
 
-        # Check for existing phone number
+        # Check for duplicate phone number
         if CustomUser.objects.filter(phone_number=phone_number).exists():
             return redirect('/add_driver/?status=phone_exists')
 
-        # Create user
+        # Create new user with phone number as password
         user = CustomUser.objects.create(
+            name=full_name,
             email=email,
             phone_number=phone_number,
-            name=full_name,
-            role='driver',
             profile=profile,
+            role='driver',
             is_active=True,
             is_staff=False,
         )
-
-        if phone_number:
-            user.set_password(phone_number)
-            user.save()
+        user.set_password(phone_number)  # Set phone number as password
+        user.save()
 
         return redirect('/driver/?status=added')
 
-    context = {
-        'current_url_name': "driver",
-    }
-    return render(request, 'add_driver.html', context)
+    return render(request, 'add_driver.html', {'current_url_name': "driver"})
 
 @login_required(login_url='/login/')
 def edit_driver(request, driver_id):
