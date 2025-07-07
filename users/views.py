@@ -468,7 +468,10 @@ def add_product_and_variant(request):
             discount_price=request.POST.get('discount_price') or None,
             selling_quantity=request.POST.get('selling_quantity'),
             selling_unit_id=request.POST.get('selling_unit'),
-        )
+            units_per_pack=request.POST.get('units_per_pack'),
+            unit_weight=request.POST.get('unit_weight'),
+            pack_unit_id=request.POST.get('pack_unit'),
+            )
         return redirect('/add_product/?status=variant_added')
 
     # Default GET rendering
@@ -883,7 +886,7 @@ def orders(request):
         .prefetch_related('items__variant__product', 'items__variant__selling_unit', 'driver_assignment__driver') \
         .order_by('-id')
 
-    # Apply search
+    # Apply search filter
     if search_query:
         orders_qs = orders_qs.filter(
             Q(user__name__icontains=search_query) |
@@ -895,23 +898,31 @@ def orders(request):
     if status_filter:
         orders_qs = orders_qs.filter(status=status_filter)
 
-    # Pagination (10 per page)
+    # Paginate
     paginator = Paginator(orders_qs, 10)
     page_obj = paginator.get_page(page_number)
 
-    # Add calculated fields
+    # Compute pricing safely
     for order in page_obj:
         total_original = 0
         total_effective = 0
         for item in order.items.all():
-            original_unit_price = float(item.variant.price)
-            effective_unit_price = float(item.price)
+            if item.variant:
+                original_unit_price = float(item.variant.price)
+                effective_unit_price = float(item.price)
+            else:
+                # Variant deleted — fallback to stored price
+                original_unit_price = float(item.price)
+                effective_unit_price = float(item.price)
+
             total_original += original_unit_price * item.quantity
             total_effective += effective_unit_price * item.quantity
+
         order.total_original_price = round(total_original, 2)
         order.total_effective_price = round(total_effective, 2)
         order.product_discount_total = round(total_original - total_effective, 2)
 
+    # Get active drivers
     drivers = CustomUser.objects.filter(role='driver', is_active=True)
 
     context = {
