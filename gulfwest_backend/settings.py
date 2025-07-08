@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'app_functionality',
     'orders',
-    'django_extensions'
+    'django_extensions',
+    'driver_app'
 ]
 
 REST_FRAMEWORK = {

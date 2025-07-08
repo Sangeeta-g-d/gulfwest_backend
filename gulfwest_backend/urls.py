@@ -24,7 +24,8 @@ urlpatterns = [
     path('api/', include('api.urls')),
     path('', include('users.urls')),
     path('api/v1/',include('app_functionality.urls')),
-    path('api/orders/',include('orders.urls'))
+    path('api/orders/',include('orders.urls')),
+    path('api/driver/',include('driver_app.urls'))
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

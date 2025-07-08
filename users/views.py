@@ -468,9 +468,6 @@ def add_product_and_variant(request):
             discount_price=request.POST.get('discount_price') or None,
             selling_quantity=request.POST.get('selling_quantity'),
             selling_unit_id=request.POST.get('selling_unit'),
-            units_per_pack=request.POST.get('units_per_pack'),
-            unit_weight=request.POST.get('unit_weight'),
-            pack_unit_id=request.POST.get('pack_unit'),
             )
         return redirect('/add_product/?status=variant_added')
 
@@ -813,14 +810,18 @@ def driver(request):
     }
     return render(request, 'driver.html', context)
 
-
 @login_required(login_url='/login/')
 def add_driver(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
         email = request.POST.get('email')
-        phone_number = request.POST.get('phone_number')
+        country_code = request.POST.get('country_code')  # Get country code
+        phone = request.POST.get('phone_number')
         profile = request.FILES.get('profile')
+
+        # Combine country code and phone number
+        phone_number = f"{country_code}{phone}".replace(" ", "").replace("-", "")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", phone_number)
 
         # Check for duplicate email
         if CustomUser.objects.filter(email=email).exists():

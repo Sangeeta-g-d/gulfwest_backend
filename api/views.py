@@ -22,7 +22,6 @@ from rest_framework.generics import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-
 @method_decorator(csrf_exempt, name='dispatch')
 class SendOTPView(APIView):
     def post(self, request):
@@ -30,20 +29,22 @@ class SendOTPView(APIView):
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
             mode = request.query_params.get('mode')  # 'login' or 'register'
+            role = request.query_params.get('role', 'customer')  # default to customer
 
-            if mode == 'login' and not CustomUser.objects.filter(phone_number=phone).exists():
-                return Response({'error': 'User does not exist. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+            if role not in ['customer', 'driver']:
+                return Response({'error': 'Invalid role. Must be "customer" or "driver".'}, status=status.HTTP_400_BAD_REQUEST)
 
-            if mode == 'register' and CustomUser.objects.filter(phone_number=phone).exists():
-                return Response({'error': 'User already exists. Please login.'}, status=status.HTTP_400_BAD_REQUEST)
+            # Filter by phone and role
+            user_exists = CustomUser.objects.filter(phone_number=phone, role=role).exists()
+
+            if mode == 'login' and not user_exists:
+                return Response({'error': f'{role.capitalize()} does not exist. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+
+            if mode == 'register' and user_exists:
+                return Response({'error': f'{role.capitalize()} already exists. Please login.'}, status=status.HTTP_400_BAD_REQUEST)
 
             otp = generate_otp()
-            print(f"Phone received: {phone}")
-            print(f"Mode: {mode}")
-            print(f"Generated OTP: {otp}")
-            print("Attempting to send OTP...")
 
-            # ✅ Save OTP first
             PhoneOTP.objects.update_or_create(
                 phone_number=phone,
                 defaults={'otp': otp, 'created_at': timezone.now()}
@@ -52,9 +53,6 @@ class SendOTPView(APIView):
             try:
                 send_otp(phone, otp)
             except TwilioRestException as e:
-                print("Twilio Error:")
-                print(str(e))
-                traceback.print_exc()
                 return Response({
                     'message': 'OTP could not be sent via SMS, but you can still use the master OTP (for dev/testing).',
                     'twilio_error': str(e),
@@ -66,7 +64,6 @@ class SendOTPView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class VerifyOTPView(APIView):
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
@@ -74,6 +71,11 @@ class VerifyOTPView(APIView):
             phone = serializer.validated_data['phone_number']
             otp_input = serializer.validated_data['otp']
             mode = request.query_params.get('mode')  # 'register' or 'login'
+            role = request.query_params.get('role', 'customer')
+            
+            if role not in ['customer', 'driver']:
+                return Response({'error': 'Invalid role. Must be "customer" or "driver".'}, status=status.HTTP_400_BAD_REQUEST)
+
             master_otp = '999999'
             try:
                 phone_otp = PhoneOTP.objects.get(phone_number=phone)
@@ -86,35 +88,32 @@ class VerifyOTPView(APIView):
             if otp_input != phone_otp.otp and otp_input != master_otp:
                 return Response({'error': 'Invalid OTP.'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # OTP is valid; delete it
             phone_otp.delete()
 
-            # Register or login based on the mode
             if mode == 'register':
-                if CustomUser.objects.filter(phone_number=phone).exists():
-                    return Response({'error': 'User already exists. Please login.'}, status=status.HTTP_400_BAD_REQUEST)
-                # Create user without requiring email
-                user = CustomUser.objects.create_user(phone_number=phone, email=None)
+                if CustomUser.objects.filter(phone_number=phone, role=role).exists():
+                    return Response({'error': f'{role.capitalize()} already exists. Please login.'}, status=status.HTTP_400_BAD_REQUEST)
+                user = CustomUser.objects.create_user(phone_number=phone, email=None, role=role)
             elif mode == 'login':
                 try:
-                    user = CustomUser.objects.get(phone_number=phone)
+                    user = CustomUser.objects.get(phone_number=phone, role=role)
                 except CustomUser.DoesNotExist:
-                    return Response({'error': 'User not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
+                    return Response({'error': f'{role.capitalize()} not found. Please register.'}, status=status.HTTP_404_NOT_FOUND)
             else:
                 return Response({'error': 'Invalid mode. Must be "register" or "login".'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Generate JWT token
             refresh = RefreshToken.for_user(user)
             return Response({
-                'message': f'User {mode}ed and authenticated successfully.',
+                'message': f'{role.capitalize()} {mode}ed and authenticated successfully.',
                 'access': str(refresh.access_token),
                 'refresh': str(refresh),
                 'user_id': user.id,
-                'phone_number': user.phone_number
+                'phone_number': user.phone_number,
+                'role': user.role
             }, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
 
 class CompleteUserRegistrationView(APIView):
     def post(self, request):

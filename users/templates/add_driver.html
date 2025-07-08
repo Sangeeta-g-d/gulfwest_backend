@@ -29,11 +29,32 @@
 
             <div class="row">
               <!-- Phone -->
-              <div class="col-md-6 form-group mb-3">
-                <label>Phone Number</label>
-                <input type="text" name="phone_number" class="form-control" placeholder="Enter phone number">
-              </div>
+               <div class="col-md-6 form-group mb-3">
+    <label>Phone Number</label>
+    <div class="input-group">
+      <div class="input-group-prepend">
+       <select name="country_code" class="form-select" style="width: 120px;" required>
+  <option value="+91" selected>🇮🇳 +91 (India)</option>
+  <option value="+1">🇺🇸 +1 (USA)</option>
+  <option value="+44">🇬🇧 +44 (UK)</option>
+  <option value="+61">🇦🇺 +61 (Australia)</option>
+  <option value="+971">🇦🇪 +971 (UAE)</option>
+  <option value="+81">🇯🇵 +81 (Japan)</option>
+  <option value="+49">🇩🇪 +49 (Germany)</option>
+  <option value="+33">🇫🇷 +33 (France)</option>
+  <option value="+86">🇨🇳 +86 (China)</option>
+  <option value="+92">🇵🇰 +92 (Pakistan)</option>
+  <option value="+880">🇧🇩 +880 (Bangladesh)</option>
+  <option value="+94">🇱🇰 +94 (Sri Lanka)</option>
+  <option value="+966">🇸🇦 +966 (Saudi Arabia)</option>
+  <option value="+234">🇳🇬 +234 (Nigeria)</option>
+  <option value="+27">🇿🇦 +27 (South Africa)</option>
+</select>
 
+      </div>
+      <input type="text" name="phone_number" class="form-control" placeholder="Enter phone number">
+    </div>
+  </div>
 
               <!-- Designation -->
               <div class="col-md-6 form-group mb-3">
