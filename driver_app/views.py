@@ -5,6 +5,7 @@ from rest_framework import status
 from orders.models import Order
 from .serializers import DriverOrderSerializer,OrderDetailSerializer
 
+
 class DriverOrderListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -14,11 +15,14 @@ class DriverOrderListAPIView(APIView):
         if user.role != 'driver':
             return Response({'error': 'Only drivers can access this endpoint.'}, status=status.HTTP_403_FORBIDDEN)
 
-        orders = Order.objects.filter(driver_assignment__driver=user).order_by('-placed_at')
+        # Only get shipped orders assigned to this driver
+        orders = Order.objects.filter(
+            driver_assignment__driver=user,
+            status='shipped'
+        ).order_by('-placed_at')
 
         serializer = DriverOrderSerializer(orders, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
 
 class OrderDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -58,3 +62,22 @@ class MarkOrderDeliveredAPIView(APIView):
         order.save()
 
         return Response({'message': f'Order #{order.id} marked as delivered.'}, status=status.HTTP_200_OK)
+    
+
+class DriverOrderHistoryAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        if user.role != 'driver':
+            return Response({'error': 'Only drivers can access this endpoint.'}, status=status.HTTP_403_FORBIDDEN)
+
+        # Get delivered orders assigned to this driver
+        delivered_orders = Order.objects.filter(
+            driver_assignment__driver=user,
+            status='delivered'
+        ).order_by('-placed_at')
+
+        serializer = DriverOrderSerializer(delivered_orders, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
