@@ -124,15 +124,26 @@ def logout_view(request):
     logout(request)
     return redirect('/login/')
 
-
 @login_required(login_url='/login/')
 def admin_dashboard(request):
-    # Redirect staff
     if not request.user.is_superuser and hasattr(request.user, 'staff_profile'):
         return redirect('staff_dashboard')
 
     now = timezone.now()
+    today = now.date()
 
+    # Get selected date from GET request or default to today
+    selected_date_str = request.GET.get('selected_date')
+    try:
+        selected_date = datetime.strptime(selected_date_str, "%Y-%m-%d").date() if selected_date_str else today
+    except ValueError:
+        selected_date = today
+
+    # Count orders on selected date
+    orders_on_date = Order.objects.filter(placed_at__date=selected_date)
+    orders_count = orders_on_date.count()
+
+    # Dashboard metrics
     total_orders = Order.objects.count()
     total_revenue = Order.objects.aggregate(total=Sum('final_total'))['total'] or Decimal('0.00')
     total_customers = CustomUser.objects.filter(role='customer').count()
@@ -145,34 +156,19 @@ def admin_dashboard(request):
         .order_by('-total_sold')[:5]
     )
 
-    active_promos = PromoCode.objects.filter(
-    is_active=True,
-    start_time__lte=now,
-    end_time__gte=now
-)
-    flash_sales = FlashSale.objects.filter(
-        is_active=True,
-        start_time__lte=now,
-        end_time__gte=now
-    ).prefetch_related('products')[:5]
+    active_promos = PromoCode.objects.filter(is_active=True, start_time__lte=now, end_time__gte=now)
+    flash_sales = FlashSale.objects.filter(is_active=True, start_time__lte=now, end_time__gte=now).prefetch_related('products')[:5]
 
     current_url_name = resolve(request.path_info).url_name
 
-    # ---------------- Pie Chart: Order Status ----------------
+    # Chart: Order status distribution
     order_status_counts = dict(
         Order.objects.values('status').annotate(count=Count('id')).values_list('status', 'count')
     )
     fig1, ax1 = plt.subplots()
-    light_colors = ['#AEDFF7', '#B8EAD9', '#FFF2A6', '#FFD6A5', '#E6CCF5']  # pastel: blue, green, yellow, orange, purple
-
-    ax1.pie(
-        order_status_counts.values(),
-        labels=order_status_counts.keys(),
-        autopct='%1.1f%%',
-        startangle=140,
-        colors=light_colors[:len(order_status_counts)],
-        textprops={'fontsize': 10}
-    )
+    light_colors = ['#AEDFF7', '#B8EAD9', '#FFF2A6', '#FFD6A5', '#E6CCF5']
+    ax1.pie(order_status_counts.values(), labels=order_status_counts.keys(), autopct='%1.1f%%',
+            startangle=140, colors=light_colors[:len(order_status_counts)], textprops={'fontsize': 10})
     ax1.axis('equal')
     buf1 = BytesIO()
     plt.savefig(buf1, format='png', bbox_inches='tight')
@@ -189,10 +185,14 @@ def admin_dashboard(request):
         'top_products': top_products,
         'flash_sales': flash_sales,
         'order_status_chart': order_status_chart,
-        'active_promos':active_promos
+        'active_promos': active_promos,
+        'orders_count': orders_count,
+        'selected_date': selected_date,
+        'today': today,
     }
 
     return render(request, 'admin_dashboard.html', context)
+
 
 @login_required(login_url='/login/')
 def customers(request):
@@ -232,6 +232,16 @@ def add_category(request):
         else:
             return JsonResponse({'status': 'error', 'message': 'Category name cannot be empty'})
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
+@login_required
+def toggle_category_status(request, category_id):
+    if request.method == "POST":
+        category = get_object_or_404(Categories, id=category_id)
+        category.is_enabled = not category.is_enabled
+        category.save()
+        return JsonResponse({"status": "success", "enabled": category.is_enabled})
+    return JsonResponse({"status": "error"}, status=400)
+
 
 @login_required(login_url='/login/')
 def category_list(request):
@@ -411,7 +421,7 @@ def add_product_and_variant(request):
             'calories': request.POST.get('calories') or '',
             'water': request.POST.get('water') or '',
             'carbs': request.POST.get('carbs') or '',
-            'is_active': request.POST.get('is_active') == 'on',
+            'is_active': True
         }
 
         # Check for duplicate SAP code
@@ -562,7 +572,6 @@ def edit_product(request, product_id):
         product.calories = request.POST.get('calories') or 0
         product.water = request.POST.get('water') or 0
         product.carbs = request.POST.get('carbs') or 0
-        product.is_active = request.POST.get('is_active') == 'on'
 
         # Optional related fields
         category_id = request.POST.get('category')
@@ -1114,7 +1123,13 @@ def staff_dashboard(request):
 @login_required(login_url='/login/')
 def onboarding_images(request):
     if request.method == 'POST' and request.FILES.get('image'):
-        OnboardingImage.objects.create(image=request.FILES['image'])
+        title = request.POST.get('title', '')
+        sub_title = request.POST.get('sub_title', '')
+        OnboardingImage.objects.create(
+            image=request.FILES['image'],
+            title=title,
+            sub_title=sub_title
+        )
         return redirect('/onboarding-images/?status=success')
 
     images = OnboardingImage.objects.all()
@@ -1123,6 +1138,7 @@ def onboarding_images(request):
         "images": images
     }
     return render(request, 'onboarding_images.html', context)
+
 
 @login_required(login_url='/login/')
 def delete_onboarding_image(request, pk):

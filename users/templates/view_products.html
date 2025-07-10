@@ -51,13 +51,16 @@
     <td>{{ product.display_name }}</td>
     <td>{{ product.brand_name|default:"None" }}</td>
     <td>{{ product.SAP_code }}</td>
-    <td>
-      {% if product.is_active %}
-        <span class="badge badge-success">Active</span>
-      {% else %}
-        <span class="badge badge-danger">Inactive</span>
-      {% endif %}
-    </td>
+    {% with product.variants.first as first_variant %}
+  <td>
+    {% if first_variant and first_variant.available %}
+      <span class="badge badge-success">Active</span>
+    {% else %}
+      <span class="badge badge-danger">Inactive</span>
+    {% endif %}
+  </td>
+{% endwith %}
+
     <td>{{ product.created_at|date:"Y-m-d" }}</td>
     <td class="text-center">
       <a href="{% url 'product_details' product.id %}" class="btn btn-dark btn-sm" title="View">

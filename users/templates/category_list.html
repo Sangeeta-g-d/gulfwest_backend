@@ -1,5 +1,4 @@
 {% extends 'admin_base.html' %}
-{% load static %}
 
 {% block content %}
 <div class="container-fluid mt-4">
@@ -27,12 +26,19 @@
           </div>
 
           <!-- 🔘 Action Buttons -->
-          <div class="card-body text-center">
-            <button class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#editModal{{ category.id }}">Edit</button>
-            <a href="{% url 'delete_category' category.id %}" 
-               class="btn btn-sm btn-danger" 
-               onclick="return confirm('Deleting category may also delete all products related. Are you sure you want to delete?');">Delete</a>
-          </div>
+       <div class="card-body text-center">
+  <button class="btn btn-sm btn-primary mr-2" data-toggle="modal" data-target="#editModal{{ category.id }}">Edit</button>
+  <a href="{% url 'delete_category' category.id %}" 
+     class="btn btn-sm btn-danger mr-2"
+     onclick="return confirm('Deleting category may also delete all products related. Are you sure you want to delete?');">Delete</a>
+
+  <!-- Bootstrap-style Toggle Switch -->
+  <div class="custom-control custom-switch d-inline-block align-middle ml-2">
+    <input type="checkbox" class="custom-control-input" id="customSwitch{{ category.id }}" 
+           onchange="toggleCategoryStatus('{{ category.id }}')" {% if category.is_enabled %}checked{% endif %}>
+    <label class="custom-control-label" for="customSwitch{{ category.id }}"></label>
+  </div>
+</div>
         </div>
       </div>
 
@@ -103,4 +109,34 @@
     window.history.replaceState({}, document.title, newUrl);
   }
 </script>
+<script>
+  function toggleCategoryStatus(categoryId) {
+    categoryId = parseInt(categoryId)
+    fetch(`/category-toggle/${categoryId}/`, {
+      method: 'POST',
+      headers: {
+        'X-CSRFToken': '{{ csrf_token }}',
+        'Content-Type': 'application/json'
+      },
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") {
+        Toastify({
+          text: `Category ${data.enabled ? 'enabled' : 'disabled'} successfully!`,
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "center",
+          style: {
+            background: data.enabled ? "white" : "white",
+            color: "black",
+          },
+        }).showToast();
+      }
+    })
+    .catch(error => console.error("Error:", error));
+  }
+</script>
+
 {% endblock %}

@@ -67,14 +67,12 @@ class UpdateZoneAreaSerializer(serializers.ModelSerializer):
         model = CustomUser
         fields = ['zone', 'area', 'latitude', 'longitude']
 
-    
 class CategorySerializer(serializers.ModelSerializer):
     background_img = serializers.ImageField(use_url=True)
 
     class Meta:
         model = Categories
-        fields = ['id', 'category_name', 'background_img']
-
+        fields = ['id', 'category_name', 'background_img', 'is_enabled'] 
     
 # product serializer
 class ProductWithFirstVariantSerializer(serializers.ModelSerializer):
@@ -411,13 +409,12 @@ class RecentProductRatingSerializer(serializers.ModelSerializer):
     def get_user_name(self, obj):
         return obj.user.name or obj.user.email or obj.user.phone_number
     
-
 class OnboardingImageSerializer(serializers.ModelSerializer):
     image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = OnboardingImage
-        fields = ['id', 'image_url']
+        fields = ['id', 'image_url', 'title', 'sub_title']  # Include new fields
 
     def get_image_url(self, obj):
         request = self.context.get('request')

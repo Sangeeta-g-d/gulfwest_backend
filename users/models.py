@@ -92,9 +92,12 @@ class Staff(models.Model):
     
 class Categories(models.Model):
     category_name = models.CharField(max_length=40)
-    background_img = models.ImageField(upload_to='category/',default="background image")
+    background_img = models.ImageField(upload_to='category/', default="background image")
+    is_enabled = models.BooleanField(default=True)  # <-- New field
+
     def __str__(self):
         return self.category_name
+
     
 # 1️⃣ Unit Model (gram, kilogram, litre, piece, etc.)
 class Unit(models.Model):
@@ -285,10 +288,11 @@ class OrderDriverAssignment(models.Model):
     def __str__(self):
         return f"Driver {self.driver} assigned to Order #{self.order.id}"
     
-
 class OnboardingImage(models.Model):
     image = models.ImageField(upload_to='onboarding/')
+    title = models.CharField(max_length=100, blank=True)
+    sub_title = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"OnboardingImage {self.id}"
+        return self.title or f"OnboardingImage {self.id}"

@@ -74,15 +74,17 @@
           {% if order.status in 'delivered,cancelled' %}disabled{% endif %}
         >Shipped</option>
 
-        <option value="delivered" 
-          {% if order.status == 'delivered' %}selected{% endif %}
-          {% if order.status == 'cancelled' %}disabled{% endif %}
-        >Delivered</option>
+       <option value="delivered" 
+  {% if order.status == 'delivered' %}selected{% endif %}
+  disabled
+>Delivered</option>
+
 
         <option value="cancelled" 
-          {% if order.status == 'cancelled' %}selected{% endif %}
-          {% if order.status == 'delivered' %}disabled{% endif %}
-        >Cancelled</option>
+  {% if order.status == 'cancelled' %}selected{% endif %}
+  {% if order.status == 'delivered' or order.driver_assignment %}disabled{% endif %}
+>Cancelled</option>
+
       </select>
 
       <div class="input-group-append">

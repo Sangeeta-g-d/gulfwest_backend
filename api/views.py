@@ -172,17 +172,26 @@ class UpdateZoneAreaView(APIView):
     
 
 class CategoryListAPIView(ListAPIView):
-    queryset = Categories.objects.all()
     serializer_class = CategorySerializer
 
+    def get_queryset(self):
+        return Categories.objects.filter(is_enabled=True)
 
 class ProductListWithSingleVariantAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        products = Product.objects.filter(is_active=True, deleted=False).prefetch_related('variants', 'flash_sales','images')
-        serializer = ProductWithFirstVariantSerializer(products, many=True,context={'request': request})
+        products = Product.objects.filter(
+            is_active=True,
+            deleted=False,
+            category__is_enabled=True  # ✅ Only include products from enabled categories
+        ).prefetch_related('variants', 'flash_sales', 'images')
+
+        serializer = ProductWithFirstVariantSerializer(
+            products, many=True, context={'request': request}
+        )
         return Response(serializer.data)
+
     
 class ProductDetailAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -253,7 +262,6 @@ class FavoriteProductListAPIView(APIView):
         )
         return Response(serializer.data)
     
-
 class BestSellingProductsAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -268,9 +276,14 @@ class BestSellingProductsAPIView(APIView):
         )
 
         product_ids = [entry['variant__product'] for entry in top_variant_data]
-        products = Product.objects.filter(id__in=product_ids)
 
-        # Preserve order according to quantity sold
+        # Filter products by enabled category only
+        products = Product.objects.filter(
+            id__in=product_ids,
+            category__is_enabled=True  # ✅ Only from enabled categories
+        )
+
+        # Preserve order based on top_variant_data
         ordered_products = sorted(products, key=lambda p: product_ids.index(p.id))
 
         serializer = ProductWithFirstVariantSerializer(ordered_products, many=True, context={'request': request})
@@ -279,6 +292,7 @@ class BestSellingProductsAPIView(APIView):
             "success": True,
             "top_products": serializer.data
         })
+
     
 class AddOrUpdateProductRatingView(APIView):
     permission_classes = [IsAuthenticated]

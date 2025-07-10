@@ -48,10 +48,7 @@
         <label>Carbs</label>
         <input type="text" name="carbs" class="form-control" value="{{ product.carbs }}">
       </div>
-      <div class="form-check mt-3">
-        <input type="checkbox" name="is_active" class="form-check-input" id="isActiveCheck" {% if product.is_active %}checked{% endif %}>
-        <label class="form-check-label" for="isActiveCheck">Active</label>
-      </div>
+    
     </div>
   </div>
 
@@ -82,12 +79,19 @@
       <div class="col-6">
         <p><strong>Selling Quantity:</strong> {{ variant.selling_quantity }}</p>
         
-        <p><strong>Price:</strong> {{ variant.price }}</p>
+        <p class="mb-1 d-flex align-items-center"><strong>Price:
+            <img src="/static/assets/img/currency.svg" alt="Rupee"
+       style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+        </strong> {{ variant.price }}</p>
        
       </div>
       <div class="col-6">
-       <p><strong>Selling Unit:</strong> {{ variant.selling_unit.name }}</p>
-        <p><strong>Discount Price:</strong> {{ variant.discount_price }}</p>
+       <p ><strong>Selling Unit:</strong> {{ variant.selling_unit.name }}</p>
+        <p class="mb-1 d-flex align-items-center">
+          <strong>Discount Price:</strong> 
+            <img src="/static/assets/img/currency.svg" alt="Rupee"
+       style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+          {{ variant.discount_price }}</p>
          {% if variant.available %}
                       <span class="badge badge-success">Available</span>
                       {% else %}

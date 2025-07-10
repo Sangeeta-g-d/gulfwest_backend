@@ -93,9 +93,17 @@
             
                       {{ variant.selling_quantity }} {{ variant.selling_unit.abbreviation }}
                     </h6>
-                    <p class="mb-1"><strong>Price:</strong> ₹{{ variant.price }}</p>
-                    <p class="mb-1">
+                   <p class="mb-1 d-flex align-items-center">
+  <strong class="mr-1">Price:</strong>
+  <img src="/static/assets/img/currency.svg" alt="Rupee"
+       style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+  {{ variant.price }}
+</p>
+
+                    <p class="mb-1 d-flex align-items-center">
                       <strong>Discount Price:</strong>
+                      <img src="/static/assets/img/currency.svg" alt="Rupee"
+       style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
                       {% if variant.discount_price %} ₹{{ variant.discount_price }} {% else %} - {% endif %}
                     </p>
                     {% if variant.discount_price %}

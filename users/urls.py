@@ -12,6 +12,7 @@ urlpatterns = [
     path('add_staff/',views.add_staff, name='add_staff'),
 
     path('add_category/', views.add_category, name='add_category'),
+    path('category-toggle/<int:category_id>/', views.toggle_category_status, name='toggle_category_status'),
     path('category_list/',views.category_list,name="category_list"),
     path('edit_category/<int:category_id>/', views.edit_category, name='edit_category'),
     path('add_unit/',views.add_unit,name="add_unit"),
