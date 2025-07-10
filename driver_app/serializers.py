@@ -43,16 +43,25 @@ class DriverOrderSerializer(serializers.ModelSerializer):
         return obj.address.city if obj.address else ""
 
 
-
 class OrderItemSerializer(serializers.ModelSerializer):
     variant_name = serializers.SerializerMethodField()
+    product_image = serializers.SerializerMethodField()
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'variant_name', 'quantity', 'price', 'total_price']
+        fields = ['id', 'variant_name', 'quantity', 'price', 'total_price', 'product_image']
 
     def get_variant_name(self, obj):
         return str(obj.variant) if obj.variant else "N/A"
+
+    def get_product_image(self, obj):
+        if obj.variant and obj.variant.product:
+            first_image = obj.variant.product.images.first()
+            request = self.context.get('request')
+            if first_image and hasattr(first_image.image, 'url'):
+                return request.build_absolute_uri(first_image.image.url) if request else first_image.image.url
+        return None
+
     
 class AddressSerializer(serializers.ModelSerializer):
     class Meta:

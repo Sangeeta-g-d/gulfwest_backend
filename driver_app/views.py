@@ -37,7 +37,8 @@ class OrderDetailAPIView(APIView):
             if not hasattr(order, 'driver_assignment') or order.driver_assignment.driver != request.user:
                 return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
 
-        serializer = OrderDetailSerializer(order)
+        serializer = OrderDetailSerializer(order, context={'request': request})
+
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
