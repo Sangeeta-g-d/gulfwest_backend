@@ -39,14 +39,23 @@
       <tr>
         <td>{{ promo.id }}</td>
         <td>{{ promo.code }}</td>
-        <td>
+  <td>
+    <div class="d-flex align-items-center">
           {% if promo.discount_type == 'percentage' %}
             {{ promo.discount_value }}%
           {% else %}
-            ₹{{ promo.discount_value }}
+            <img src="/static/assets/img/currency.svg" alt="Rupee"
+             style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+             {{ promo.discount_value }}
           {% endif %}
+          </div>
         </td>
-        <td>₹{{ promo.minimum_order_amount }}</td>
+        <td>
+           <div class="d-flex align-items-center">
+            <img src="/static/assets/img/currency.svg" alt="Rupee"
+             style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+             {{ promo.minimum_order_amount }}
+           </div></td>
         <td>
           {% if promo.usage_limit %}
             {{ promo.usage_limit }}

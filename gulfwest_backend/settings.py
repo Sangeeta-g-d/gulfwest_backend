@@ -52,7 +52,8 @@ INSTALLED_APPS = [
     'app_functionality',
     'orders',
     'django_extensions',
-    'driver_app'
+    'driver_app',
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
 REST_FRAMEWORK = {
@@ -63,6 +64,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+}
+
+SIMPLE_JWT = {
+    'BLACKLIST_AFTER_ROTATION': True,  # Important for logout
 }
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # Optional, for raw POST body

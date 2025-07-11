@@ -51,7 +51,13 @@
         <tr>
           <td>#{{ order.id }}</td>
           <td>{{ order.user.get_full_name|default:order.user.email }}</td>
-          <td>₹{{ order.final_total }}</td>
+          <td>
+            <div>
+               <img src="/static/assets/img/currency.svg" alt="Rupee"
+             style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+             {{ order.final_total }}
+            </div>
+            </td>
           <td>{{ order.placed_at|date:"Y-m-d" }}</td>
 
 <td>
@@ -229,7 +235,10 @@
             <p><strong>Status:</strong> {{ order.get_status_display }}</p>
             <p><strong>Payment Type:</strong> {{ order.get_payment_type_display }}</p>
             {% if order.promo_code %}
-              <p><strong>Promo Code:</strong> {{ order.promo_code.code }} ({{ order.promo_code.get_discount_type_display }} - ₹{{ order.promo_code.discount_value }})</p>
+              <p><strong>Promo Code:</strong> {{ order.promo_code.code }} ({{ order.promo_code.get_discount_type_display }} - 
+                <img src="/static/assets/img/currency.svg" alt="Rupee" style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+                {{ order.promo_code.discount_value }})
+              </p>
             {% endif %}
           </div>
         </div>
@@ -249,66 +258,94 @@
         <div class="mt-3">
           <h6><strong>Items Ordered:</strong></h6>
           <table class="table table-sm table-bordered">
-  <thead class="thead-light">
-    <tr>
-      <th>Product</th>
-      <th>Variant</th>
-      <th>Qty</th>
-      <th>Original Price</th>
-      <th>Effective Price</th>
-      <th>Total</th>
-    </tr>
-  </thead>
+            <thead class="thead-light">
+              <tr>
+                <th>Product</th>
+                <th>Variant</th>
+                <th>Qty</th>
+                <th>Original Price</th>
+                <th>Effective Price</th>
+                <th>Total</th>
+              </tr>
+            </thead>
 
-  <tbody>
-    {% for item in order.items.all %}
-      {% if item.variant %}
-        <tr>
-          <td>{{ item.variant.product.display_name }}</td>
-          <td>{{ item.variant.selling_quantity }} {{ item.variant.selling_unit.abbreviation }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>₹{{ item.variant.price|floatformat:2 }}</td>
-          <td>
-            ₹{{ item.price|floatformat:2 }}
-            {% if item.price < item.variant.price %}
-              <span class="badge badge-warning">Flash Deal</span>
-            {% endif %}
-          </td>
-          <td>₹{{ item.total_price|floatformat:2 }}</td>
-        </tr>
-      {% else %}
-        <tr class="text-muted">
-          <td colspan="6">
-            <i class="text-danger">This product variant has been deleted</i><br>
-            Qty: {{ item.quantity }} &nbsp;|&nbsp; 
-            Unit Price: ₹{{ item.price|floatformat:2 }} &nbsp;|&nbsp;
-            Total: ₹{{ item.total_price|floatformat:2 }}
-          </td>
-        </tr>
-      {% endif %}
-    {% endfor %}
-  </tbody>
-</table>
-
+            <tbody>
+              {% for item in order.items.all %}
+                {% if item.variant %}
+                  <tr>
+                    <td>{{ item.variant.product.display_name }}</td>
+                    <td>{{ item.variant.selling_quantity }} {{ item.variant.selling_unit.abbreviation }}</td>
+                    <td>{{ item.quantity }}</td>
+                    <td>
+                      <img src="/static/assets/img/currency.svg" alt="Rupee"
+                           style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+                      {{ item.variant.price|floatformat:2 }}
+                    </td>
+                    <td>
+                      <img src="/static/assets/img/currency.svg" alt="Rupee"
+                           style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+                      {{ item.price|floatformat:2 }}
+                      {% if item.price < item.variant.price %}
+                        <span class="badge badge-warning">Flash Deal</span>
+                      {% endif %}
+                    </td>
+                    <td>
+                      <img src="/static/assets/img/currency.svg" alt="Rupee"
+                           style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+                      {{ item.total_price|floatformat:2 }}
+                    </td>
+                  </tr>
+                {% else %}
+                  <tr class="text-muted">
+                    <td colspan="6">
+                      <i class="text-danger">This product variant has been deleted</i><br>
+                      Qty: {{ item.quantity }} &nbsp;|&nbsp;
+                      Unit Price:
+                      <img src="/static/assets/img/currency.svg" alt="Rupee"
+                           style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+                      {{ item.price|floatformat:2 }} &nbsp;|&nbsp;
+                      Total:
+                      <img src="/static/assets/img/currency.svg" alt="Rupee"
+                           style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+                      {{ item.total_price|floatformat:2 }}
+                    </td>
+                  </tr>
+                {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
 
         <!-- Order Total -->
-        <!-- Order Total -->
-<div class="text-right mt-3">
-  <p><strong>Original Total (Before Any Discounts):</strong> ₹{{ order.original_total }}</p>
- <p><strong>Product/Flash Discounts:</strong> ₹{{ order.product_discount_total|floatformat:2 }}</p>
+        <div class="text-right mt-3">
+          <p><strong>Original Total (Before Any Discounts):</strong>
+            <img src="/static/assets/img/currency.svg" alt="Rupee"
+                 style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+            {{ order.original_total }}
+          </p>
+          <p><strong>Product/Flash Discounts:</strong>
+            <img src="/static/assets/img/currency.svg" alt="Rupee"
+                 style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+            {{ order.product_discount_total|floatformat:2 }}
+          </p>
 
-  {% if order.promo_code %}
-    <p><strong>Promo Code ({{ order.promo_code.code }}):</strong> 
-      - ₹{{ order.discount|floatformat:2 }} 
-      ({{ order.promo_code.get_discount_type_display }})
-    </p>
-  {% endif %}
+          {% if order.promo_code %}
+            <p><strong>Promo Code ({{ order.promo_code.code }}):</strong> -
+              <img src="/static/assets/img/currency.svg" alt="Rupee"
+                   style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+              {{ order.discount|floatformat:2 }}
+              ({{ order.promo_code.get_discount_type_display }})
+            </p>
+          {% endif %}
 
-  <p><strong>Final Payable Amount:</strong> 
-    <span class="text-success font-weight-bold">₹{{ order.final_total|floatformat:2 }}</span>
-  </p>
-</div>
+          <p><strong>Final Payable Amount:</strong>
+            <span class="text-success font-weight-bold">
+              <img src="/static/assets/img/currency.svg" alt="Rupee"
+                   style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+              {{ order.final_total|floatformat:2 }}
+            </span>
+          </p>
+        </div>
 
       </div>
 
@@ -318,6 +355,7 @@
     </div>
   </div>
 </div>
+
 
 {% endfor %}
 <script>

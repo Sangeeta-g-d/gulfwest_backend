@@ -12,6 +12,7 @@ urlpatterns = [
    path('login/', PhoneLoginView.as_view(), name='phone-login'),
    path('update-zone-area/', UpdateZoneAreaView.as_view(), name='update-zone-area'),
    path('categories/', CategoryListAPIView.as_view(), name='category-list'),
+   path('logout/', LogoutAPIView.as_view(), name='logout'),
 
    # newly added
    path('products/', ProductListWithSingleVariantAPIView.as_view(), name='product-single-variant'),

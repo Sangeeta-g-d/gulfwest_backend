@@ -10,6 +10,7 @@ import random
 from django.db.models import Q
 from users.models import CustomUser
 from .utils.otp import generate_otp, send_otp
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 from twilio.base.exceptions import TwilioRestException
 import traceback
 from rest_framework.permissions import IsAuthenticated
@@ -341,3 +342,20 @@ class OnboardingImageListAPIView(APIView):
         images = OnboardingImage.objects.all().order_by('-uploaded_at')
         serializer = OnboardingImageSerializer(images, many=True, context={'request': request})
         return Response(serializer.data)
+    
+
+class LogoutAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            refresh_token = request.data.get("refresh")
+            if not refresh_token:
+                return Response({"error": "Refresh token required."}, status=status.HTTP_400_BAD_REQUEST)
+
+            token = RefreshToken(refresh_token)
+            token.blacklist()
+
+            return Response({"message": "Successfully logged out."}, status=status.HTTP_205_RESET_CONTENT)
+        except TokenError:
+            return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)

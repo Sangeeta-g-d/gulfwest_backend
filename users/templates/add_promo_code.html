@@ -57,19 +57,19 @@
               </div>
             </div>
 
-            <div class="row">
-              <!-- Start Time -->
-              <div class="col-md-6 form-group mb-3">
-                <label>Start Time</label>
-                <input type="datetime-local" name="start_time" class="form-control" required>
-              </div>
+          <div class="row">
+  <!-- Start Time -->
+  <div class="col-md-6 form-group mb-3">
+    <label>Start Time</label>
+    <input type="datetime-local" id="startTime" name="start_time" class="form-control" required>
+  </div>
 
-              <!-- End Time -->
-              <div class="col-md-6 form-group mb-3">
-                <label>End Time</label>
-                <input type="datetime-local" name="end_time" class="form-control" required>
-              </div>
-            </div>
+  <!-- End Time -->
+  <div class="col-md-6 form-group mb-3">
+    <label>End Time</label>
+    <input type="datetime-local" id="endTime" name="end_time" class="form-control" required>
+  </div>
+</div>
 
             <!-- Description -->
             <div class="form-group mb-3">
@@ -94,4 +94,22 @@
     </div>
   </div>
 </div>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const pad = n => n < 10 ? '0' + n : n;
+
+    const now = new Date();
+    const yyyy = now.getFullYear();
+    const mm = pad(now.getMonth() + 1);
+    const dd = pad(now.getDate());
+    const hh = pad(now.getHours());
+    const min = pad(now.getMinutes());
+
+    const formattedNow = `${yyyy}-${mm}-${dd}T${hh}:${min}`;
+
+    document.getElementById("startTime").setAttribute("min", formattedNow);
+    document.getElementById("endTime").setAttribute("min", formattedNow);
+  });
+</script>
+
 {% endblock %}
