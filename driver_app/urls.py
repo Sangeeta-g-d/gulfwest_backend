@@ -8,4 +8,5 @@ urlpatterns = [
     path('update-order-status/<int:order_id>/', MarkOrderDeliveredAPIView.as_view(), name='mark-order-delivered'),
     path('order-history/', DriverOrderHistoryAPIView.as_view(), name='driver-order-history'),
     path('driver-stats/', DriverStatisticsAPIView.as_view(), name='driver_stats'),
+    path('driver-profile/', DriverProfileAPIView.as_view(), name='driver-profile'),
 ]

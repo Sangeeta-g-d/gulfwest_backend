@@ -111,3 +111,21 @@ class DriverStatisticsAPIView(APIView):
             'delivered_orders': delivered_count,
             'pending_orders': pending_count,
         })
+    
+
+class DriverProfileAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        if user.role != 'driver':
+            return Response({'error': 'Access denied. Only drivers can access this info.'}, status=403)
+
+        data = {
+            'email': user.email,
+            'phone_number': user.phone_number,
+            'name': user.name,
+        }
+
+        return Response(data, status=200)
