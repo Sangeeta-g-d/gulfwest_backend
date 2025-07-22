@@ -239,11 +239,24 @@ class DeleteAddressAPIView(APIView):
 
     def delete(self, request, address_id):
         address = get_object_or_404(Address, id=address_id, user=request.user)
+
+        # Check if any undelivered orders are using this address
+        has_active_orders = address.orders.filter(
+            status__in=['pending', 'confirmed', 'shipped']
+        ).exists()
+
+        if has_active_orders:
+            return Response({
+                "error": "This address is associated with an active order and cannot be deleted until the order is delivered."
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        # Safe to delete
         address.delete()
         return Response({
             "message": "Address deleted successfully"
         }, status=status.HTTP_200_OK)
-
+    
+    
 class UserAddressListAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
