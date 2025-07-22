@@ -22,7 +22,7 @@ urlpatterns = [
 
     # flash sale 19-6-25
     path('flash-sale-info/',ActiveFlashSaleAPIView.as_view(),name="flash-sale"),
-    # path('profile/', UserProfileAPIView.as_view(), name='user-profile'),
+    path('profile/', UserProfileAPIView.as_view(), name='user-profile'),
     path('reorder/<int:order_id>/', ReorderAPIView.as_view(), name='reorder'),
 
 
