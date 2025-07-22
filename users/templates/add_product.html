@@ -7,85 +7,83 @@
 
             <!-- Product Details Form -->
             <div class="card mb-4">
-  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-    <h6 class="m-0 font-weight-bold text-primary">Add Product Details</h6>
-  </div>
-  <div class="card-body">
-    <form method="POST" action="{% url 'add_product' %}" enctype="multipart/form-data">
-      {% csrf_token %}
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="display_name">Display Name</label>
-          <input type="text" name="display_name" class="form-control" id="display_name"
-            value="{{ form_data.display_name|default_if_none:'' }}" required placeholder="e.g., Basmati Rice">
-        </div>
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Add Product Details</h6>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{% url 'add_product' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="display_name">Display Name</label>
+                                <input type="text" name="display_name" class="form-control" id="display_name"
+                                    value="{{ form_data.display_name|default_if_none:'' }}" required placeholder="e.g., Basmati Rice">
+                            </div>
 
-        <div class="form-group col-md-6">
-          <label for="category">Category</label>
-          <select name="category" class="form-control" required>
-            <option value="">Select Category</option>
-            {% for category in categories %}
-              <option value="{{ category.id }}"
-                {% if form_data.category == category.id|stringformat:"s" %}selected{% endif %}>
-                {{ category.category_name }}
-              </option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
+                            <div class="form-group col-md-6">
+                                <label for="category">Category</label>
+                                <select name="category" class="form-control" required>
+                                    <option value="">Select Category</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}"
+                                            {% if form_data.category == category.id|stringformat:"s" %}selected{% endif %}>
+                                            {{ category.category_name }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
 
-      <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="SAP_code">SAP Code</label>
-          <input type="text" name="SAP_code" class="form-control"
-            value="{{ form_data.SAP_code|default_if_none:'' }}" required placeholder="e.g., SAP12345">
-        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="SAP_code">SAP Code</label>
+                                <input type="text" name="SAP_code" class="form-control"
+                                    value="{{ form_data.SAP_code|default_if_none:'' }}" required placeholder="e.g., SAP12345">
+                            </div>
 
-        <div class="form-group col-md-6">
-          <label for="brand_name">Brand Name (optional)</label>
-          <input type="text" name="brand_name" class="form-control"
-            value="{{ form_data.brand_name|default_if_none:'' }}" placeholder="e.g., India Gate">
-        </div>
-      </div>
+                            <div class="form-group col-md-6">
+                                <label for="brand_name">Brand Name (optional)</label>
+                                <input type="text" name="brand_name" class="form-control"
+                                    value="{{ form_data.brand_name|default_if_none:'' }}" placeholder="e.g., India Gate">
+                            </div>
+                        </div>
 
-      <div class="form-row">
-        <div class="form-group col-md-4">
-          <label for="calories">Calories (optional)</label>
-          <input type="text" name="calories" class="form-control"
-            value="{{ form_data.calories|default_if_none:'' }}" placeholder="e.g., 130 kcal">
-        </div>
-        <div class="form-group col-md-4">
-          <label for="water">Water (optional)</label>
-          <input type="text" name="water" class="form-control"
-            value="{{ form_data.water|default_if_none:'' }}" placeholder="e.g., 10%">
-        </div>
-        <div class="form-group col-md-4">
-          <label for="carbs">Carbs (optional)</label>
-          <input type="text" name="carbs" class="form-control"
-            value="{{ form_data.carbs|default_if_none:'' }}" placeholder="e.g., 28g">
-        </div>
-      </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-4">
+                                <label for="calories">Calories (optional)</label>
+                                <input type="text" name="calories" class="form-control"
+                                    value="{{ form_data.calories|default_if_none:'' }}" placeholder="e.g., 130 kcal">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="water">Water (optional)</label>
+                                <input type="text" name="water" class="form-control"
+                                    value="{{ form_data.water|default_if_none:'' }}" placeholder="e.g., 10%">
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="carbs">Carbs (optional)</label>
+                                <input type="text" name="carbs" class="form-control"
+                                    value="{{ form_data.carbs|default_if_none:'' }}" placeholder="e.g., 28g">
+                            </div>
+                        </div>
 
-      <div class="form-group">
-        <label for="description">Description</label>
-        <textarea name="description" class="form-control" rows="3"
-          placeholder="e.g., Premium quality long grain rice.">{{ form_data.description|default_if_none:'' }}</textarea>
-      </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea name="description" class="form-control" rows="3"
+                                placeholder="e.g., Premium quality long grain rice.">{{ form_data.description|default_if_none:'' }}</textarea>
+                        </div>
 
-      <div class="form-group">
-        <label for="product_images">Product Images (multiple allowed)</label>
-        <input type="file" name="product_images" id="product_images" class="form-control" multiple>
-      </div>
+                        <div class="form-group">
+                            <label for="product_images">Product Images (multiple allowed)</label>
+                            <input type="file" name="product_images" id="product_images" class="form-control" multiple>
+                        </div>
 
-      
-
-      <button type="submit" class="btn btn-primary mt-3">Save Product</button>
-    </form>
-  </div>
-</div>
-
+                        <button type="submit" class="btn btn-primary mt-3">Save Product</button>
+                    </form>
+                </div>
+            </div>
 
             <!-- Product Variant Form -->
+           <!-- Product Variant Form -->
             <div class="card mb-4">
                 <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
                     <h6 class="m-0 font-weight-bold text-success">Add Variant for Any Product</h6>
@@ -94,14 +92,15 @@
                     <form method="POST" action="{% url 'add_product' %}">
                         {% csrf_token %}
                         <div class="form-group">
-                        <label for="product">Select Product</label>
-                        <select name="product" class="form-control select2-product" required>
-                            <option value="">-- Choose Product --</option>
-                            {% for product in products %}
-                            <option value="{{ product.id }}">{{ product.display_name }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                            <label for="product-search">Select Product</label>
+                            <input type="text" id="product-search" class="form-control" 
+                                   placeholder="Type to search products..." autocomplete="off" required>
+                            <input type="hidden" id="product-id" name="product">
+                            <div id="product-results" class="list-group mt-2" style="display:none; max-height: 200px; overflow-y: auto;"></div>
+                            <small class="form-text text-muted">Start typing to search products</small>
+                        </div>
+                        
+                        <!-- Rest of your form fields remain unchanged -->
                         <div class="form-row">
                             <div class="form-group col-md-6">
                                 <label for="price">Price</label>
@@ -136,52 +135,143 @@
         </div>
     </div>
 </div>
+ <div id="product-data" 
+         data-products='{% spaceless %}
+             {% for product in products %}
+                 {"name":"{{ product.display_name|escapejs }}","id":"{{ product.id }}"}
+                 {% if not forloop.last %},{% endif %}
+             {% endfor %}
+         {% endspaceless %}' 
+         style="display:none;">
+    </div>
 <script>
-  const status = "{{ status|default:''|escapejs }}";
-
-  console.log("Status:", status); // debug
-
-  function showToast(text, bgColor, textColor) {
-    Toastify({
-      text: text,
-      duration: 3000,
-      close: true,
-      gravity: "top",
-      position: "center",
-      style: {
-        background: bgColor,
-        color: textColor,
-      },
-    }).showToast();
-  }
-
-  if (status === "fail") {
-    showToast("Failed to add product details!", "linear-gradient(to right, #ffffff, #ed9a85)", "black");
-  } else if (status === "SAP_exists") {
-    showToast("Product with the given SAP code already exists!", "white", "black");
-  } else if (status === "variant_added") {
-    showToast("Product variant added successfully!", "white", "black");
-    cleanUrl();
-  } else if (status === "true") {
-    showToast("Product added successfully!", "white", "black");
-    cleanUrl();
-  }
-
-  function cleanUrl() {
-    const newUrl = window.location.origin + window.location.pathname;
-    window.history.replaceState({}, document.title, newUrl);
-  }
-</script>
-
-
-
-<script>
-    $(document).ready(function() {
-        $('.select2-product').select2({
-            placeholder: "Search and select a product",
-            allowClear: true
-        });
+document.addEventListener('DOMContentLoaded', function() {
+    // Get product data safely from the hidden div
+    const productDataElement = document.getElementById('product-data');
+    const products = JSON.parse(`[${productDataElement.dataset.products}]`);
+    
+    // Convert array to object for easier lookup
+    const productMap = {};
+    products.forEach(product => {
+        productMap[product.name] = product.id;
     });
+
+    // Product search functionality
+    const productSearch = document.getElementById('product-search');
+    const productIdInput = document.getElementById('product-id');
+    const productResults = document.getElementById('product-results');
+    
+    // Debounce function to limit how often we process the input
+    function debounce(func, timeout = 300) {
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }
+    
+    // Show search results
+    const processSearch = debounce(function() {
+        const searchTerm = productSearch.value.toLowerCase();
+        productResults.innerHTML = '';
+        
+        if (searchTerm.length < 2) {
+            productResults.style.display = 'none';
+            return;
+        }
+        
+        let hasResults = false;
+        
+        // Search through product names
+        for (const [name, id] of Object.entries(productMap)) {
+            if (name.toLowerCase().includes(searchTerm)) {
+                const item = document.createElement('div');
+                item.className = 'list-group-item list-group-item-action';
+                item.textContent = name;
+                item.addEventListener('click', function() {
+                    productSearch.value = name;
+                    productIdInput.value = id;
+                    productResults.style.display = 'none';
+                });
+                productResults.appendChild(item);
+                hasResults = true;
+            }
+        }
+        
+        productResults.style.display = hasResults ? 'block' : 'none';
+    });
+    
+    // Event listeners
+    productSearch.addEventListener('input', processSearch);
+    productSearch.addEventListener('focus', processSearch);
+    
+    // Hide results when clicking elsewhere
+    document.addEventListener('click', function(e) {
+        if (!productSearch.contains(e.target) && !productResults.contains(e.target)) {
+            productResults.style.display = 'none';
+        }
+    });
+    
+    // Form validation to ensure a product was selected
+    document.querySelector('form').addEventListener('submit', function(e) {
+        if (!productIdInput.value) {
+            e.preventDefault();
+            alert('Please select a valid product from the list');
+            productSearch.focus();
+        }
+    });
+
+    // Existing status notification code
+    const status = "{{ status|default:''|escapejs }}";
+
+    function showToast(text, bgColor, textColor) {
+        Toastify({
+            text: text,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "center",
+            style: {
+                background: bgColor,
+                color: textColor,
+            },
+        }).showToast();
+    }
+
+    if (status === "fail") {
+        showToast("Failed to add product details!", "linear-gradient(to right, #ffffff, #ed9a85)", "black");
+    } else if (status === "SAP_exists") {
+        showToast("Product with the given SAP code already exists!", "white", "black");
+    } else if (status === "variant_added") {
+        showToast("Product variant added successfully!", "white", "black");
+        cleanUrl();
+    } else if (status === "true") {
+        showToast("Product added successfully!", "white", "black");
+        cleanUrl();
+    }
+
+    function cleanUrl() {
+        const newUrl = window.location.origin + window.location.pathname;
+        window.history.replaceState({}, document.title, newUrl);
+    }
+});
 </script>
 
+<style>
+/* Custom styling for the search results */
+#product-results {
+    position: absolute;
+    z-index: 1000;
+    width: calc(100% - 30px);
+    box-shadow: 0 6px 12px rgba(0,0,0,.175);
+}
+
+#product-results .list-group-item {
+    cursor: pointer;
+}
+
+#product-results .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+</style>
 {% endblock %}
