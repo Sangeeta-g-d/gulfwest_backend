@@ -15,6 +15,7 @@ from django.http import JsonResponse
 from . models import Categories
 from orders.models import *
 from django.db.models import Q
+from firebase_admin import messaging
 from django.urls import reverse
 from decimal import Decimal
 from django.core.files.storage import FileSystemStorage
@@ -953,13 +954,31 @@ def change_order_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     new_status = request.POST.get('status')
 
-    # Optional: validate status
     valid_statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
     if new_status in valid_statuses:
         order.status = new_status
         order.save()
 
-    return redirect('orders')  # Redirect back to the orders list page
+        # ✅ Fetch all tokens for this user
+        device_tokens = DeviceToken.objects.filter(user=order.user).values_list("token", flat=True)
+
+        if device_tokens:
+            message = messaging.MulticastMessage(
+                tokens=list(device_tokens),
+                notification=messaging.Notification(
+                    title="Order Update",
+                    body=f"Your order #{order.id} is now {new_status.capitalize()}."
+                ),
+                data={
+                    "order_id": str(order.id),
+                    "status": new_status
+                }
+            )
+            response = messaging.send_multicast(message)
+            print(f"✅ Sent {response.success_count} notifications, {response.failure_count} failed")
+
+    return redirect('orders')
+
 
 
 

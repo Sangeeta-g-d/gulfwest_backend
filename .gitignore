@@ -10,3 +10,4 @@ __pycache__/
 venv/
 ENV/
 env/
+firebase_service_key.json

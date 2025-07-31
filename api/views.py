@@ -359,3 +359,17 @@ class LogoutAPIView(APIView):
             return Response({"message": "Successfully logged out."}, status=status.HTTP_205_RESET_CONTENT)
         except TokenError:
             return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class SaveDeviceTokenAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        d_token = request.data.get("token")
+        if not d_token:
+            return Response({"error": "Token is required"}, status=400)
+
+        # ✅ Create if not exists, but don’t overwrite others
+        DeviceToken.objects.get_or_create(user=request.user, token=d_token)
+
+        return Response({"message": "Token saved successfully"})

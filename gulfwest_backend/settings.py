@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'driver_app',
     'rest_framework_simplejwt.token_blacklist',
+    
 ]
 
 REST_FRAMEWORK = {
@@ -72,6 +73,18 @@ SIMPLE_JWT = {
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # Optional, for raw POST body
 FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
+
+
+import os
+import firebase_admin
+from firebase_admin import credentials
+
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+FIREBASE_CRED_PATH = os.path.join(BASE_DIR, "firebase_service_key.json")
+
+cred = credentials.Certificate(FIREBASE_CRED_PATH)
+firebase_admin.initialize_app(cred)
 
 
 from datetime import timedelta

@@ -24,6 +24,7 @@ urlpatterns = [
    path('search-products/', ProductSearchAPIView.as_view(), name='product_search'),
 
    path('onboarding-images/', OnboardingImageListAPIView.as_view(), name='onboarding_images_api'),
+   path("save-device-token/", SaveDeviceTokenAPIView.as_view(), name="save_device_token"),
 
 ]
 
