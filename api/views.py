@@ -365,7 +365,7 @@ class SaveDeviceTokenAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        d_token = request.data.get("token")
+        d_token = request.data.get("d_token")
         if not d_token:
             return Response({"error": "Token is required"}, status=400)
 
