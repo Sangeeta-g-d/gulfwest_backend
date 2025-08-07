@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-2ud5tt_h_9#+g_acca%tcz6_kyio0#06&q$w%i8*u7oc4wl6n0
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['147.93.27.106','127.0.0.1','localhost']
+ALLOWED_HOSTS = ['147.93.27.106','127.0.0.1','localhost','192.168.1.21']
 
 
 from dotenv import load_dotenv
@@ -129,6 +129,7 @@ CORS_ALLOWED_ORIGINS = [
      # Add your device's IP and port
     'http://localhost:8000',  # Local development on localhost (if needed)
     'http://147.93.27.106',
+    'https://192.168.1.21',
         # Localhost on your development machine (if needed)
     'http://127.0.0.1:800'
 ]

@@ -369,7 +369,6 @@ class SaveDeviceTokenAPIView(APIView):
         if not d_token:
             return Response({"error": "Token is required"}, status=400)
 
-        # ✅ Create if not exists, but don’t overwrite others
         DeviceToken.objects.get_or_create(user=request.user, token=d_token)
 
         return Response({"message": "Token saved successfully"})

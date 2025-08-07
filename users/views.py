@@ -3,15 +3,18 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
 from django.urls import resolve
 from django.core.paginator import Paginator
+from firebase_admin.exceptions import FirebaseError
 from .utils import login_required_nocache 
 from django.contrib.auth.decorators import login_required
 from . models import *
 from django.db.models import Sum, Count
 from django.utils.timezone import make_aware
 from django.utils.timezone import now
-from django.utils.timezone import now
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse
+import logging
+import os
+from jwt import PyJWTError
 from . models import Categories
 from orders.models import *
 from django.db.models import Q
@@ -38,6 +41,11 @@ import matplotlib.pyplot as plt
 import matplotlib
 matplotlib.use('Agg')  # Use Agg backend for non-GUI rendering
 import matplotlib.pyplot as plt
+import firebase_admin
+from firebase_admin import credentials, messaging
+from .utils import  initialize_firebase
+
+initialize_firebase()
 
 def upload_bulk_products(request, id):
     if request.method == 'POST' and request.FILES.get('file'):
@@ -949,38 +957,88 @@ def orders(request):
     }
     return render(request, 'orders.html', context)
 
+
+
 @require_POST
 def change_order_status(request, order_id):
+    print("➡️ Entered change_order_status view")
+
+    # Get order and validate status
     order = get_object_or_404(Order, id=order_id)
-    new_status = request.POST.get('status')
+    new_status = request.POST.get('status', '').lower()
+    print(f"➡️ Order ID: {order.id}, New Status: {new_status}")
 
     valid_statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled']
-    if new_status in valid_statuses:
-        order.status = new_status
-        order.save()
+    if new_status not in valid_statuses:
+        print(f"⚠️ Invalid status attempted: {new_status}")
+        return redirect('orders')
 
-        # ✅ Fetch all tokens for this user
-        device_tokens = DeviceToken.objects.filter(user=order.user).values_list("token", flat=True)
+    # Update order status
+    order.status = new_status
+    order.save()
+    print(f"✅ Order updated to {order.status}")
 
-        if device_tokens:
-            message = messaging.MulticastMessage(
-                tokens=list(device_tokens),
-                notification=messaging.Notification(
-                    title="Order Update",
-                    body=f"Your order #{order.id} is now {new_status.capitalize()}."
-                ),
+    # Get active device tokens
+    try:
+        device_tokens = list(DeviceToken.objects.filter(
+            user=order.user,
+            is_active=True
+        ).values_list("token", flat=True))
+        print(f"➡️ Found {len(device_tokens)} active tokens")
+    except Exception as e:
+        print(f"⚠️ Error fetching tokens: {str(e)}")
+        return redirect('orders')
+
+    if not device_tokens:
+        print("⚠️ No active device tokens found for this user.")
+        return redirect('orders')
+
+    # Prepare notification
+    notification = messaging.Notification(
+        title="Order Status Update",
+        body=f"Your order #{order.id} is now {new_status.capitalize()}."
+    )
+
+    success_count = 0
+    for token in device_tokens:
+        try:
+            message = messaging.Message(
+                token=token,
+                notification=notification,
                 data={
                     "order_id": str(order.id),
-                    "status": new_status
-                }
+                    "status": new_status,
+                    "type": "order_update"
+                },
+                android=messaging.AndroidConfig(
+                    priority="high",
+                    notification=messaging.AndroidNotification(
+                        sound="default",
+                        channel_id="order_updates",
+                        click_action="FLUTTER_NOTIFICATION_CLICK"
+                    )
+                ),
+                apns=messaging.APNSConfig(
+                    headers={"apns-priority": "10"},
+                    payload=messaging.APNSPayload(
+                        aps=messaging.Aps(
+                            sound="default",
+                            content_available=True,
+                            badge=1
+                        )
+                    )
+                )
             )
-            response = messaging.send_multicast(message)
-            print(f"✅ Sent {response.success_count} notifications, {response.failure_count} failed")
 
+            response = messaging.send(message)
+            print(f"📨 Successfully sent to token {token[:10]}...")
+            success_count += 1
+
+        except Exception as e:
+            print(f"❌ Error with token {token[:10]}...: {str(e)}")
+
+    print(f"📊 Notification summary: {success_count}/{len(device_tokens)} succeeded")
     return redirect('orders')
-
-
-
 
 @login_required_nocache
 def delete_order(request, order_id):
@@ -988,7 +1046,7 @@ def delete_order(request, order_id):
     order.delete()
     return redirect('/orders/?status=deleted')
 
-@login_required_nocache
+@login_required
 def assign_driver_to_order(request, order_id):
     if request.method == 'POST':
         driver_id = request.POST.get('driver_id')
@@ -1005,8 +1063,63 @@ def assign_driver_to_order(request, order_id):
         order.status = 'shipped'
         order.save()
 
-    # Redirect back to orders page without invalid filter
+        print(f"✅ Driver {driver.full_name} assigned to Order {order.id}")
+
+        # 🔔 Send push notification to driver
+        device_tokens = list(DeviceToken.objects.filter(
+            user=driver,
+            is_active=True
+        ).values_list("token", flat=True))
+
+        if device_tokens:
+            notification = messaging.Notification(
+                title="📦 New Order Assigned",
+                body=f"Order #{order.id} has been assigned to you. Please check your dashboard."
+            )
+
+            success_count = 0
+            for token in device_tokens:
+                try:
+                    message = messaging.Message(
+                        token=token,
+                        notification=notification,
+                        data={
+                            "order_id": str(order.id),
+                            "status": order.status,
+                            "type": "driver_assignment"
+                        },
+                        android=messaging.AndroidConfig(
+                            priority="high",
+                            notification=messaging.AndroidNotification(
+                                sound="default",
+                                channel_id="driver_assignments",
+                                click_action="FLUTTER_NOTIFICATION_CLICK"
+                            )
+                        ),
+                        apns=messaging.APNSConfig(
+                            headers={"apns-priority": "10"},
+                            payload=messaging.APNSPayload(
+                                aps=messaging.Aps(
+                                    sound="default",
+                                    content_available=True,
+                                    badge=1
+                                )
+                            )
+                        )
+                    )
+                    response = messaging.send(message)
+                    print(f"📨 Sent assignment notification to driver token {token[:10]}...")
+                    success_count += 1
+                except Exception as e:
+                    print(f"❌ Error sending to driver token {token[:10]}...: {str(e)}")
+
+            print(f"📊 Driver notification summary: {success_count}/{len(device_tokens)} succeeded")
+        else:
+            print("⚠️ No active device tokens found for driver")
+
+    # Redirect back to orders page
     return redirect('/orders/')
+
 
 @login_required_nocache
 def promo_code(request):

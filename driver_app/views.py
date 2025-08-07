@@ -3,9 +3,11 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from orders.models import Order
+from firebase_admin import messaging
 from .serializers import DriverOrderSerializer,OrderDetailSerializer
 from users.models import OrderDriverAssignment
 from django.db.models import Sum, Count, Q
+from users.models import DeviceToken
 
 class DriverOrderListAPIView(APIView):
     permission_classes = [IsAuthenticated]
@@ -42,7 +44,6 @@ class OrderDetailAPIView(APIView):
 
         return Response(serializer.data, status=status.HTTP_200_OK)
     
-
 class MarkOrderDeliveredAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -67,6 +68,59 @@ class MarkOrderDeliveredAPIView(APIView):
 
         order.status = 'delivered'
         order.save()
+        print(f"✅ Order {order.id} marked as delivered by driver {request.user.full_name}")
+
+        # 🔔 Notify the customer (order.user)
+        device_tokens = list(DeviceToken.objects.filter(
+            user=order.user,
+            is_active=True
+        ).values_list("token", flat=True))
+
+        if device_tokens:
+            notification = messaging.Notification(
+                title="🎉 Order Delivered",
+                body=f"Your order #{order.id} has been successfully delivered."
+            )
+
+            success_count = 0
+            for token in device_tokens:
+                try:
+                    message = messaging.Message(
+                        token=token,
+                        notification=notification,
+                        data={
+                            "order_id": str(order.id),
+                            "status": order.status,
+                            "type": "order_delivered"
+                        },
+                        android=messaging.AndroidConfig(
+                            priority="high",
+                            notification=messaging.AndroidNotification(
+                                sound="default",
+                                channel_id="order_updates",
+                                click_action="FLUTTER_NOTIFICATION_CLICK"
+                            )
+                        ),
+                        apns=messaging.APNSConfig(
+                            headers={"apns-priority": "10"},
+                            payload=messaging.APNSPayload(
+                                aps=messaging.Aps(
+                                    sound="default",
+                                    content_available=True,
+                                    badge=1
+                                )
+                            )
+                        )
+                    )
+                    response = messaging.send(message)
+                    print(f"📨 Sent delivery notification to customer token {token[:10]}...")
+                    success_count += 1
+                except Exception as e:
+                    print(f"❌ Error sending to customer token {token[:10]}...: {str(e)}")
+
+            print(f"📊 Customer notification summary: {success_count}/{len(device_tokens)} succeeded")
+        else:
+            print("⚠️ No active device tokens found for customer")
 
         return Response({
             'message': f'Order #{order.id} marked as delivered.',
