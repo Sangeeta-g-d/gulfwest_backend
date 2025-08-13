@@ -119,6 +119,11 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',  # Keep this after CORS middleware
 ]
 
+import os
+
+TAQNYAT_API_TOKEN = os.getenv("TAQNYAT_API_TOKEN")
+TAQNYAT_SENDER_NAME = os.getenv("TAQNYAT_SENDER_NAME")
+TAQNYAT_API_URL = os.getenv("TAQNYAT_API_URL", "https://api.taqnyat.sa/v1/messages")
 
 CSRF_TRUSTED_ORIGINS = [
     'https://44bd-2401-4900-65ac-d314-ddd5-25bb-3302-b003.ngrok-free.app',

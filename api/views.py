@@ -53,10 +53,10 @@ class SendOTPView(APIView):
 
             try:
                 send_otp(phone, otp)
-            except TwilioRestException as e:
+            except Exception as e:
                 return Response({
                     'message': 'OTP could not be sent via SMS, but you can still use the master OTP (for dev/testing).',
-                    'twilio_error': str(e),
+                    'error': str(e),
                     'dev_note': 'Use master OTP: 999999 if configured.'
                 }, status=status.HTTP_400_BAD_REQUEST)
 

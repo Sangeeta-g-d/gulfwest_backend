@@ -1,21 +1,28 @@
-# utils/otp.py
-from twilio.rest import Client
 import random
+import requests
 from django.conf import settings
 
 def generate_otp():
     return str(random.randint(100000, 999999))
 
 def send_otp(phone_number, otp):
-    from twilio.rest import Client
-    from django.conf import settings
+    """
+    Send OTP using Taqnyat SMS API
+    """
+    url = settings.TAQNYAT_API_URL
+    headers = {
+        "Authorization": f"Bearer {settings.TAQNYAT_API_TOKEN}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "recipients": [phone_number],
+        "body": f"Your OTP is {otp}",
+        "sender": settings.TAQNYAT_SENDER_NAME
+    }
 
-    print(f"Using TWILIO_PHONE_NUMBER: {settings.TWILIO_PHONE_NUMBER}")  # This should be +16165372783
+    response = requests.post(url, json=payload, headers=headers)
 
-    client = Client(settings.TWILIO_ACCOUNT_SID, settings.TWILIO_AUTH_TOKEN)
-    message = client.messages.create(
-        body=f"Your OTP is {otp}",
-        from_=settings.TWILIO_PHONE_NUMBER,
-        to=phone_number
-    )
-    return message.sid
+    if response.status_code != 200:
+        raise Exception(f"Taqnyat SMS failed: {response.text}")
+
+    return response.json()
