@@ -12,18 +12,17 @@ def generate_otp():
     return otp
 
 def send_otp(phone_number, otp):
-    """
-    Send OTP using Taqnyat SMS API (HTTP POST style) with debug logging
-    """
     logger.debug(f"Raw phone number input: {phone_number}")
 
-    phone_number = phone_number.lstrip('+').replace(" ", "")
+    phone_number = phone_number.strip().replace(" ", "")
+    if not phone_number.startswith("+"):
+        phone_number = "+" + phone_number
     logger.debug(f"Processed phone number: {phone_number}")
 
     url = f"{settings.TAQNYAT_API_URL}"
     payload = {
         "body": f"Your OTP is {otp}",
-        "recipients": [phone_number],  # Must be a list
+        "recipients": [phone_number],
         "sender": settings.TAQNYAT_SENDER_NAME
     }
 
