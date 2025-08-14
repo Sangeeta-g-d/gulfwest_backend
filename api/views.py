@@ -29,6 +29,7 @@ class SendOTPView(APIView):
         serializer = SendOTPSerializer(data=request.data)
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
+            phone = phone.lstrip('+').replace(" ", "")
             mode = request.query_params.get('mode')  # 'login' or 'register'
             role = request.query_params.get('role', 'customer')  # default to customer
 
