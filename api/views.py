@@ -29,14 +29,12 @@ class SendOTPView(APIView):
         serializer = SendOTPSerializer(data=request.data)
         if serializer.is_valid():
             phone = serializer.validated_data['phone_number']
-            phone = phone.lstrip('+').replace(" ", "")
             mode = request.query_params.get('mode')  # 'login' or 'register'
-            role = request.query_params.get('role', 'customer')  # default to customer
+            role = request.query_params.get('role', 'customer')
 
             if role not in ['customer', 'driver']:
-                return Response({'error': 'Invalid role. Must be "customer" or "driver".'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Invalid role'}, status=status.HTTP_400_BAD_REQUEST)
 
-            # Filter by phone and role
             user_exists = CustomUser.objects.filter(phone_number=phone, role=role).exists()
 
             if mode == 'login' and not user_exists:
@@ -64,8 +62,8 @@ class SendOTPView(APIView):
             return Response({'message': 'OTP sent successfully.'}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+    
+    
 class VerifyOTPView(APIView):
     def post(self, request):
         serializer = VerifyOTPSerializer(data=request.data)
