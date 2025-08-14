@@ -1,33 +1,29 @@
 import random
 import requests
+import logging
 from django.conf import settings
 
-def generate_otp():
-    """Generate a random 6-digit OTP."""
-    return str(random.randint(100000, 999999))
+# Configure logger
+logger = logging.getLogger(__name__)
 
-def format_phone_for_taqnyat(phone_number: str) -> str:
-    """
-    Format phone number to Taqnyat's expected format:
-    - No '+' or '00'
-    - Full country code + number
-    - No spaces or dashes
-    """
-    phone_number = phone_number.strip().replace(" ", "").replace("-", "")
-    if phone_number.startswith("+"):
-        phone_number = phone_number[1:]
-    if phone_number.startswith("00"):
-        phone_number = phone_number[2:]
-    return phone_number
+def generate_otp():
+    otp = str(random.randint(100000, 999999))
+    logger.debug(f"Generated OTP: {otp}")
+    return otp
 
 def send_otp(phone_number, otp):
-    """Send OTP using Taqnyat SMS API (HTTP POST)."""
-    formatted_phone = format_phone_for_taqnyat(phone_number)
+    """
+    Send OTP using Taqnyat SMS API (HTTP POST style) with debug logging
+    """
+    logger.debug(f"Raw phone number input: {phone_number}")
 
-    url = settings.TAQNYAT_API_URL
+    phone_number = phone_number.lstrip('+').replace(" ", "")
+    logger.debug(f"Processed phone number: {phone_number}")
+
+    url = f"{settings.TAQNYAT_API_URL}"
     payload = {
         "body": f"Your OTP is {otp}",
-        "recipients": [formatted_phone],  # Must be a list
+        "recipients": [phone_number],  # Must be a list
         "sender": settings.TAQNYAT_SENDER_NAME
     }
 
@@ -36,17 +32,22 @@ def send_otp(phone_number, otp):
         "Content-Type": "application/json"
     }
 
-    print("=== DEBUG: Sending OTP ===")
-    print("URL:", url)
-    print("Payload:", payload)
-    print("Headers:", headers)
+    logger.debug(f"Sending POST request to {url}")
+    logger.debug(f"Payload: {payload}")
+    logger.debug(f"Headers: {headers}")
 
-    response = requests.post(url, json=payload, headers=headers)
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        logger.debug(f"Response status code: {response.status_code}")
+        logger.debug(f"Response text: {response.text}")
 
-    print("=== DEBUG: Response Status:", response.status_code)
-    print("=== DEBUG: Response Body:", response.text)
+        if response.status_code not in [200, 201]:
+            logger.error(f"Taqnyat SMS failed: {response.text}")
+            raise Exception(f"Taqnyat SMS failed: {response.text}")
 
-    if response.status_code not in [200, 201]:
-        raise Exception(f"Taqnyat SMS failed: {response.text}")
+        logger.info(f"OTP sent successfully to {phone_number}")
+        return response.json()
 
-    return response.json()
+    except Exception as e:
+        logger.exception(f"Error while sending OTP to {phone_number}: {e}")
+        raise
