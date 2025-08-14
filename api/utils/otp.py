@@ -11,7 +11,7 @@ def send_otp(phone_number, otp):
     """
     phone_number = phone_number.lstrip('+').replace(" ", "")  # Remove + and spaces
 
-    url = f"{settings.TAQNYAT_API_URL}/messages"
+    url = f"{settings.TAQNYAT_API_URL}"
     params = {
         "bearerTokens": settings.TAQNYAT_API_TOKEN,
         "sender": settings.TAQNYAT_SENDER_NAME,
