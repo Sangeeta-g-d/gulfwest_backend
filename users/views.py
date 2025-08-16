@@ -1061,9 +1061,10 @@ def assign_driver_to_order(request, order_id):
 
         # Update status to 'shipped'
         order.status = 'shipped'
+
         order.save()
 
-        print(f"✅ Driver {driver.full_name} assigned to Order {order.id}")
+        print(f"✅ Driver {driver.name} assigned to Order {order.id}")
 
         # 🔔 Send push notification to driver
         device_tokens = list(DeviceToken.objects.filter(
