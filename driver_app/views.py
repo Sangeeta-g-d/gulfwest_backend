@@ -68,7 +68,7 @@ class MarkOrderDeliveredAPIView(APIView):
 
         order.status = 'delivered'
         order.save()
-        print(f"✅ Order {order.id} marked as delivered by driver {request.user.full_name}")
+        print(f"✅ Order {order.id} marked as delivered by driver {request.user.name}")
 
         # 🔔 Notify the customer (order.user)
         device_tokens = list(DeviceToken.objects.filter(
