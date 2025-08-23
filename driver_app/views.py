@@ -48,29 +48,50 @@ class MarkOrderDeliveredAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, order_id):
+        print(f"➡️  Request to mark order #{order_id} delivered by user {request.user} (role={request.user.role})")
+
+        # Try to fetch the order
         try:
             order = Order.objects.get(id=order_id)
         except Order.DoesNotExist:
+            print("❌ Order not found")
             return Response({'error': 'Order not found.'}, status=status.HTTP_404_NOT_FOUND)
 
-        # ✅ Only allow assigned driver to update
+        print(f"✅ Order found. Current status = {order.status}")
+
+        # --- Only allow the driver assigned to this order ---
         if request.user.role == 'driver':
-            if not hasattr(order, 'driver_assignment') or order.driver_assignment.driver != request.user:
+            da = getattr(order, "driver_assignment", None)
+            print(f"🔎 Driver assignment = {da} (assigned_driver={getattr(da, 'driver', None)})")
+
+            if not da or da.driver != request.user:
+                print("❌ Driver mismatch or no driver assignment")
                 return Response({'error': 'You are not assigned to this order.'}, status=status.HTTP_403_FORBIDDEN)
 
-            # ✅ Optionally update payment_type if provided
+            # Optionally update payment_type if provided
             new_payment_type = request.data.get('payment_type')
+            print(f"💳 new_payment_type from request = {new_payment_type}")
+
             if new_payment_type in dict(Order.PAYMENT_CHOICES):
                 order.payment_type = new_payment_type
+                print(f"✅ payment_type updated to {new_payment_type}")
+            else:
+                print("⚠️  invalid payment_type OR no payment_type provided - leaving unchanged")
 
+        # Prevent double updates
         if order.status == 'delivered':
-            return Response({'message': 'Order is already marked as delivered.'}, status=status.HTTP_200_OK)
+            print("ℹ️  Order already delivered – no update done")
+            return Response(
+                {'message': 'Order is already marked as delivered.'},
+                status=status.HTTP_200_OK
+            )
 
+        # --- Perform the update ---
         order.status = 'delivered'
         order.save()
-        print(f"✅ Order {order.id} marked as delivered by driver {request.user.name}")
+        print(f"✅ Order #{order.id} marked as delivered by driver {request.user.name}")
 
-        # 🔔 Notify the customer (order.user)
+        # Send FCM notification to customer
         device_tokens = list(DeviceToken.objects.filter(
             user=order.user,
             is_active=True
@@ -126,6 +147,7 @@ class MarkOrderDeliveredAPIView(APIView):
             'message': f'Order #{order.id} marked as delivered.',
             'payment_type': order.payment_type
         }, status=status.HTTP_200_OK)
+
 
 class DriverOrderHistoryAPIView(APIView):
     permission_classes = [IsAuthenticated]

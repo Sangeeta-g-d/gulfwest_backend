@@ -11,19 +11,42 @@ def generate_otp():
     logger.debug(f"Generated OTP: {otp}")
     return otp
 
+def otp_to_words(otp: str) -> str:
+    """
+    Convert numeric OTP into words (e.g. "1234" -> "one two three four")
+    """
+    digit_map = {
+        "0": "zero",
+        "1": "one",
+        "2": "two",
+        "3": "three",
+        "4": "four",
+        "5": "five",
+        "6": "six",
+        "7": "seven",
+        "8": "eight",
+        "9": "nine",
+    }
+    return " ".join(digit_map[d] for d in otp)
+
+
 def send_otp(phone_number, otp):
     """
-    Send OTP using Taqnyat SMS API (HTTP POST style) with debug logging
+    Send OTP using Taqnyat SMS API (HTTP POST style) with debug logging.
+    OTP will be sent in words.
     """
     logger.debug(f"Raw phone number input: {phone_number}")
 
     phone_number = phone_number.lstrip('+').replace(" ", "")
     logger.debug(f"Processed phone number: {phone_number}")
 
+    otp_in_words = otp_to_words(otp)
+    logger.debug(f"OTP in words: {otp_in_words}")
+
     url = f"{settings.TAQNYAT_API_URL}"
     payload = {
-        "body": f"Your OTP is {otp}",
-        "recipients": [phone_number],  # Must be a list
+        "body": f"Your one time password is: {otp_in_words}",
+        "recipients": [phone_number],
         "sender": settings.TAQNYAT_SENDER_NAME
     }
 
