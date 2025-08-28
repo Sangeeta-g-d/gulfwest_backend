@@ -47,10 +47,10 @@ def send_otp(phone_number, otp):
 
     message_body = (
         f"HALA WALLA!!\n"
-        f"Your Verification code: {otp} ({otp_in_words}), Never share this code with anyone\n"
+        f"Your Verification code: {otp}, Never share this code with anyone\n"
         f"gulfwest.com\n\n"
         f"هلا و الله !!!\n"
-        f"رمز التأكيد الخاص بك {otp} ({otp_in_words}), لا تشارك هذا الرمز مع أحد\n"
+        f"رمز التأكيد الخاص بك {otp}, لا تشارك هذا الرمز مع أحد\n"
         f"شركة الخليج الغربية"
     )
 
