@@ -29,18 +29,14 @@ def otp_to_words(otp: str) -> str:
     }
     return " ".join(digit_map[d] for d in otp)
 
-
 def send_otp(phone_number, otp):
     phone_number = phone_number.lstrip('+').replace(" ", "")
 
-    url = settings.TAQNYAT_API_URL.rstrip('/') + "/messagesVars"
+    url = settings.TAQNYAT_API_URL.rstrip('/') + "/messages"
     payload = {
         "sender": settings.TAQNYAT_SENDER_NAME,
-        "body": "Your OTP is CodeVar",   # Template with variable
-        "recipients": [phone_number],
-        "vars": [
-            {"CodeVar": otp}
-        ]
+        "body": f"Your OTP is {otp}",   # Direct text, no vars
+        "recipients": [phone_number]
     }
 
     headers = {
@@ -51,8 +47,8 @@ def send_otp(phone_number, otp):
     response = requests.post(url, json=payload, headers=headers)
 
     if response.status_code not in [200, 201]:
-        logger.error(f"SMS Template failed: {response.text}")
-        raise Exception(f"SMS Template failed: {response.text}")
+        logger.error(f"SMS failed: {response.text}")
+        raise Exception(f"SMS failed: {response.text}")
 
     logger.info(f"OTP SMS sent successfully to {phone_number}")
     return response.json()
