@@ -28,24 +28,33 @@ def otp_to_words(otp: str) -> str:
         "9": "nine",
     }
     return " ".join(digit_map[d] for d in otp)
-
-
 def send_otp(phone_number, otp):
     """
     Send OTP using Taqnyat SMS API (HTTP POST style) with debug logging.
-    OTP will be sent in words.
+    Sends bilingual message (English + Arabic) with numeric + word format.
     """
     logger.debug(f"Raw phone number input: {phone_number}")
 
     phone_number = phone_number.lstrip('+').replace(" ", "")
     logger.debug(f"Processed phone number: {phone_number}")
 
-    otp_in_words = otp_to_words(otp)
-    logger.debug(f"OTP in words: {otp_in_words}")
+    url = settings.TAQNYAT_API_URL.rstrip('/') + "/messages"
 
-    url = f"{settings.TAQNYAT_API_URL}"
+    # Convert OTP digits to words
+    otp_in_words = otp_to_words(otp)
+
+    # Bilingual OTP message with number + words
+    message_body = (
+        f"HALA WALLA!!\n"
+        f"Your Verification code: {otp} ({otp_in_words}), Never share this code with anyone\n"
+        f"gulfwest.com\n\n"
+        f"هلا و الله !!!\n"
+        f"رمز التأكيد الخاص بك {otp} ({otp_in_words}), لا تشارك هذا الرمز مع أحد\n"
+        f"شركة الخليج الغربية"
+    )
+
     payload = {
-        "body": f"Your one time password is: {otp_in_words}",
+        "body": message_body,
         "recipients": [phone_number],
         "sender": settings.TAQNYAT_SENDER_NAME
     }
