@@ -38,7 +38,7 @@ def send_otp(phone_number, otp):
     phone_number = phone_number.lstrip('+').replace(" ", "")
     logger.debug(f"Processed phone number: {phone_number}")
 
-    url = settings.TAQNYAT_API_URL.rstrip('/') + "/messages"
+    url = settings.TAQNYAT_API_URL.rstrip('/') + "/v1/messages"
 
     # Convert OTP digits to words
     otp_in_words = otp_to_words(otp)
