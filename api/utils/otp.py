@@ -29,14 +29,25 @@ def otp_to_words(otp: str) -> str:
     }
     return " ".join(digit_map[d] for d in otp)
 
-def send_otp(phone_number, otp):
-    phone_number = phone_number.lstrip('+').replace(" ", "")
 
-    url = settings.TAQNYAT_API_URL.rstrip('/') + "/messages"
+def send_otp(phone_number, otp):
+    """
+    Send OTP using Taqnyat SMS API (HTTP POST style) with debug logging.
+    OTP will be sent in words.
+    """
+    logger.debug(f"Raw phone number input: {phone_number}")
+
+    phone_number = phone_number.lstrip('+').replace(" ", "")
+    logger.debug(f"Processed phone number: {phone_number}")
+
+    otp_in_words = otp_to_words(otp)
+    logger.debug(f"OTP in words: {otp_in_words}")
+
+    url = f"{settings.TAQNYAT_API_URL}"
     payload = {
-        "sender": settings.TAQNYAT_SENDER_NAME,
-        "body": f"Your OTP is {otp}",   # Direct text, no vars
-        "recipients": [phone_number]
+        "body": f"Your one time password is: {otp_in_words}",
+        "recipients": [phone_number],
+        "sender": settings.TAQNYAT_SENDER_NAME
     }
 
     headers = {
@@ -44,11 +55,22 @@ def send_otp(phone_number, otp):
         "Content-Type": "application/json"
     }
 
-    response = requests.post(url, json=payload, headers=headers)
+    logger.debug(f"Sending POST request to {url}")
+    logger.debug(f"Payload: {payload}")
+    logger.debug(f"Headers: {headers}")
 
-    if response.status_code not in [200, 201]:
-        logger.error(f"SMS failed: {response.text}")
-        raise Exception(f"SMS failed: {response.text}")
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        logger.debug(f"Response status code: {response.status_code}")
+        logger.debug(f"Response text: {response.text}")
 
-    logger.info(f"OTP SMS sent successfully to {phone_number}")
-    return response.json()
+        if response.status_code not in [200, 201]:
+            logger.error(f"Taqnyat SMS failed: {response.text}")
+            raise Exception(f"Taqnyat SMS failed: {response.text}")
+
+        logger.info(f"OTP sent successfully to {phone_number}")
+        return response.json()
+
+    except Exception as e:
+        logger.exception(f"Error while sending OTP to {phone_number}: {e}")
+        raise
