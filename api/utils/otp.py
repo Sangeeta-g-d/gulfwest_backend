@@ -30,7 +30,7 @@ def otp_to_words(otp: str) -> str:
     return " ".join(digit_map[d] for d in otp)
 
 
-def send_otp_sms_template(phone_number, otp):
+def send_otp(phone_number, otp):
     phone_number = phone_number.lstrip('+').replace(" ", "")
 
     url = settings.TAQNYAT_API_URL.rstrip('/') + "/messagesVars"
