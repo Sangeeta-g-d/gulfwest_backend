@@ -46,7 +46,7 @@ def send_otp(phone_number, otp):
     # Bilingual OTP message with number + words
     message_body = (
         f"HALA WALLA!!\n"
-        f"Your Verification code: {otp} ({otp_in_words}), Never share this code with anyone\n"
+        f"Your one type password is: {otp} ({otp_in_words}), Never share this code with anyone\n"
         f"gulfwest.com\n\n"
         f"هلا و الله !!!\n"
         f"رمز التأكيد الخاص بك {otp} ({otp_in_words}), لا تشارك هذا الرمز مع أحد\n"
