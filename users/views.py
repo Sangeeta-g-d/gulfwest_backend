@@ -468,7 +468,7 @@ def add_staff(request):
 def edit_staff_details(request, staff_id):
     staff = get_object_or_404(Staff, id=staff_id)
     user = staff.user
-    roles = Role.objects.all()  # Get all roles
+    roles = Role.objects.all()
 
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
@@ -476,7 +476,23 @@ def edit_staff_details(request, staff_id):
         phone_number = request.POST.get('phone_number')
         city = request.POST.get('city')
         designation = request.POST.get('designation')
-        selected_roles = request.POST.getlist('roles')  # Get selected roles
+        selected_roles = request.POST.getlist('roles')
+
+        # ✅ Check for duplicate email
+        if CustomUser.objects.exclude(id=user.id).filter(email=email).exists():
+            return render(request, 'edit_staff_details.html', {
+                'staff': staff,
+                'roles': roles,
+                'error': "This email is already used by another user."
+            })
+
+        # ✅ Check for duplicate phone
+        if phone_number and CustomUser.objects.exclude(id=user.id).filter(phone_number=phone_number).exists():
+            return render(request, 'edit_staff_details.html', {
+                'staff': staff,
+                'roles': roles,
+                'error': "This phone number is already used by another user."
+            })
 
         # Update user fields
         user.email = email
@@ -492,15 +508,14 @@ def edit_staff_details(request, staff_id):
         staff.save()
 
         # Update staff roles
-        staff.roles.set(selected_roles)  # Overwrite roles with selected ones
+        staff.roles.set(selected_roles)
 
         return redirect('/staff_details/?status=updated')
 
-    context = {
+    return render(request, 'edit_staff_details.html', {
         'staff': staff,
         'roles': roles
-    }
-    return render(request, 'edit_staff_details.html', context)
+    })
 
 @login_required_nocache
 def delete_staff(request, staff_id):

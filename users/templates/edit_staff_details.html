@@ -78,4 +78,24 @@
     </div>
   </div>
 </div>
+
+{% if error %}
+<script>
+    Toastify({
+        text: "{{ error }}",
+        duration: 4000,
+        close: true,
+        gravity: "top", 
+        position: "right",
+        style: {
+            background: "white",
+            color: "black",
+            border: "1px solid #ccc",
+            fontWeight: "500"
+        }
+    }).showToast();
+</script>
+{% endif %}
+
+
 {% endblock %}

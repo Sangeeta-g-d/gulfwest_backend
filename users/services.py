@@ -15,7 +15,7 @@ def anonymize_user(user):
             pass
 
     user.email = f"deleted_user_{stamp}@deleted.local"
-    user.phone_number = None
+    user.phone_number = f"deleted_{user.id}"
     user.name = "Deleted User"
     user.gender = None
     user.dob = None
