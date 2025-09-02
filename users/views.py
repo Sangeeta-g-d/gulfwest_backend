@@ -34,7 +34,7 @@ from django.contrib import messages
 from django.utils import timezone
 import pytz
 from datetime import datetime
-
+from django.views.decorators.http import require_http_methods
 from io import BytesIO
 import base64
 import matplotlib.pyplot as plt
@@ -50,10 +50,54 @@ from django.utils.encoding import force_bytes, force_str
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-
+from django.db import transaction
+from .services import anonymize_user
 User = get_user_model()
 
 initialize_firebase()
+
+
+
+
+@require_http_methods(["GET", "POST"])
+def anonymize_account_view(request):
+    """
+    Public/self-service endpoint:
+    - User enters phone + password.
+    - If correct, anonymize account.
+    """
+    error_msg = None
+    success_msg = None
+
+    if request.method == "POST":
+        phone = (request.POST.get("phone") or "").strip()
+        password = request.POST.get("password") or ""
+
+        try:
+            user = User.objects.get(phone_number=phone, is_active=True)
+        except User.DoesNotExist:
+            error_msg = "Invalid phone or password."
+        else:
+            if not user.check_password(password):
+                error_msg = "Invalid phone or password."
+            else:
+                # Optional: only allow customers to self-delete
+                # if user.role != "customer":
+                #     error_msg = "Only customer accounts can be anonymized via this page."
+
+                if not error_msg:
+                    with transaction.atomic():
+                        anonymize_user(user)
+
+                    # If the same user is logged in, log them out
+                    if request.user.is_authenticated and request.user.pk == user.pk:
+                        logout(request)
+
+                    success_msg = "Your account has been anonymized successfully."
+                    return render(request, "deleted.html", {"success_msg": success_msg})
+
+    return render(request, "anonymize_account.html", {"error_msg": error_msg})
+
 
 def upload_bulk_products(request, id):
     if request.method == 'POST' and request.FILES.get('file'):

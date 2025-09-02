@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Delete Account</title>
+  <link rel="stylesheet" href="/static/assets/css/login.css">
+
+  <!-- toastify -->
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <style>
+    .danger-note {
+      font-size: 0.9rem; 
+      color: #b02a37; 
+      background: #f8d7da; 
+      padding: 10px; 
+      border-radius: 8px; 
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h2>Delete Account</h2>
+
+    <div class="danger-note">
+      This will anonymize your account (remove personal details and deactivate login) but keep past orders for reporting.
+      This action cannot be undone.
+    </div>
+
+    <form method="POST" id="deleteForm" onsubmit="return confirm('Are you sure you want to anonymize your account? This cannot be undone.');">
+      {% csrf_token %}
+
+      <label for="phone">Phone Number</label>
+      <input type="text" name="phone" id="phone" placeholder="Enter your phone number" required />
+
+      <label for="password">Password</label>
+      <div class="password-wrapper">
+        <input type="password" name="password" id="password" placeholder="Enter your password" required />
+        <i class="fa-solid fa-eye" id="togglePassword"></i>
+      </div>
+
+      <button type="submit" class="btn btn-danger">Confirm & Delete</button>
+      <br/>
+      <a href="{% url 'login' %}" style="text-decoration: none;">Back to Login</a>
+    </form>
+  </div>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script>
+    // Toastify messages from backend
+    (function(){
+      var errorMessage = "{{ error_msg|default:''|escapejs }}";
+      if (errorMessage && errorMessage !== "None") {
+        Toastify({
+          text: errorMessage,
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "center",
+          backgroundColor: "#ff4d4d",
+        }).showToast();
+      }
+    })();
+
+    // Toggle password visibility
+    const togglePassword = document.getElementById('togglePassword');
+    const passwordField  = document.getElementById('password');
+    togglePassword.addEventListener('click', function(){
+      const type = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+      passwordField.setAttribute('type', type);
+      this.classList.toggle('fa-eye-slash');
+    });
+  </script>
+</body>
+</html>

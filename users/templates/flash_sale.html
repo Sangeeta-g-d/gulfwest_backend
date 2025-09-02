@@ -85,10 +85,9 @@
               <strong>End:</strong> {{ sale.end_time|date:"M d, Y H:i" }} 
             </p>
             {% endtimezone %}
-          <span class="badge {% if sale.is_active %}bg-success{% else %}bg-secondary{% endif %}">
-            {% if sale.is_active %} Active {% else %} Inactive {% endif %}
-          </span>
-
+ <span class="badge {% if sale.currently_active %}bg-success{% else %}bg-secondary text-white{% endif %}">
+  {% if sale.currently_active %} Active {% else %} Inactive {% endif %}
+</span>
           <!-- Applicable Categories/Products -->
           <div class="mt-3">
             <p class="mb-1"><strong>Applies to:</strong></p>

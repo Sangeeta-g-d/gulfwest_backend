@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Account Deleted</title>
+  <link rel="stylesheet" href="/static/assets/css/login.css">
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+</head>
+<body>
+  <div class="login-container">
+    <h2>Account Deleted</h2>
+    <p>Your account has been anonymized successfully.</p>
+  </div>
+
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script>
+    (function(){
+      var successMessage = "{{ success_msg|default:'Account anonymized successfully.'|escapejs }}";
+      if (successMessage && successMessage !== "None") {
+        Toastify({
+          text: successMessage,
+          duration: 3000,
+          close: true,
+          gravity: "top",
+          position: "center",
+          backgroundColor: "#28a745",
+        }).showToast();
+      }
+    })();
+  </script>
+</body>
+</html>
