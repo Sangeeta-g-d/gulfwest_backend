@@ -32,6 +32,8 @@ urlpatterns = [
     path('delete_product/<int:product_id>/', views.delete_product, name='delete_product'),
     path('edit_variant/<int:variant_id>/', views.edit_variant, name='edit_variant'),
     path('delete_variant/<int:variant_id>/', views.delete_variant, name='delete_variant'),
+    path("forgot-password/", views.forgot_password_view, name="forgot_password"),
+    path("reset-password/<uidb64>/<token>/", views.reset_password_view, name="reset_password"),
 
 
     # staff details

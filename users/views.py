@@ -44,6 +44,14 @@ import matplotlib.pyplot as plt
 import firebase_admin
 from firebase_admin import credentials, messaging
 from .utils import  initialize_firebase
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.contrib.auth import get_user_model
+from django.urls import reverse
+
+User = get_user_model()
 
 initialize_firebase()
 
@@ -131,6 +139,64 @@ def login_view(request):
             error_msg = "Invalid username or password."
     return render(request,'login.html', {'error_msg': error_msg})
 
+def forgot_password_view(request):
+    error_msg = None
+    success_msg = None
+
+    if request.method == "POST":
+        email = request.POST.get("email")
+        try:
+            user = User.objects.get(email=email)
+            print(user)
+            # ✅ allow only admin or staff
+            if not (user.is_superuser or user.role == "staff"):
+                raise User.DoesNotExist
+
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+            reset_link = request.build_absolute_uri(
+                reverse("reset_password", kwargs={"uidb64": uid, "token": token})
+            )
+
+            # Send Email
+            subject = "Password Reset Request"
+            message = f"Hi {user.name or 'User'},\n\nClick below to reset your password:\n{reset_link}\n\nIf you didn’t request this, ignore this email."
+            send_mail(subject, message, None, [user.email])
+
+            success_msg = "Password reset link has been sent to your email."
+        except User.DoesNotExist:
+            error_msg = "No admin/staff user found with this email."
+
+    return render(request, "forgot_password.html", {"error_msg": error_msg, "success_msg": success_msg})
+
+# Reset Password View
+def reset_password_view(request, uidb64, token):
+    error_msg = None
+    success_msg = None
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+
+    if user is not None and default_token_generator.check_token(user, token):
+        if request.method == "POST":
+            password1 = request.POST.get("password1")
+            password2 = request.POST.get("password2")
+
+            if password1 and password1 == password2:
+                user.set_password(password1)
+                user.save()
+                success_msg = "Password reset successful. You can now login."
+                return redirect("login")  # redirect to login
+            else:
+                error_msg = "Passwords do not match."
+
+        return render(request, "reset_password.html", {"error_msg": error_msg, "success_msg": success_msg})
+    else:
+        error_msg = "Invalid or expired reset link."
+        return render(request, "reset_password.html", {"error_msg": error_msg})
 
 def logout_view(request):
     logout(request)
