@@ -77,14 +77,11 @@ FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024
 
 import os
 import firebase_admin
-from firebase_admin import credentials
+# settings.py
+from users.firebase_config import initialize_firebase
 
-
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-FIREBASE_CRED_PATH = os.path.join(BASE_DIR, "firebase_service_key.json")
-
-cred = credentials.Certificate(FIREBASE_CRED_PATH)
-firebase_admin.initialize_app(cred)
+# Initialize Firebase safely
+initialize_firebase()
 
 
 from datetime import timedelta

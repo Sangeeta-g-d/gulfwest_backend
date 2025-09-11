@@ -63,6 +63,29 @@
                 >
               </div>
             </div>
+            <div class="row">
+  <!-- Province -->
+  <div class="col-md-6 form-group mb-3">
+    <label>Province</label>
+    <select name="province" class="form-control" required>
+      <option value="" disabled selected>Select Province</option>
+      <option value="Riyadh">Riyadh</option>
+      <option value="Makkah">Makkah</option>
+      <option value="Madinah">Madinah</option>
+      <option value="Qassim">Qassim</option>
+      <option value="Eastern Province">Eastern Province</option>
+      <option value="Asir">Asir</option>
+      <option value="Tabuk">Tabuk</option>
+      <option value="Hail">Hail</option>
+      <option value="Northern Borders">Northern Borders</option>
+      <option value="Jizan">Jizan</option>
+      <option value="Najran">Najran</option>
+      <option value="Al-Bahah">Al-Bahah</option>
+      <option value="Al-Jawf">Al-Jawf</option>
+    </select>
+  </div>
+</div>
+
             <div class="form-group mb-3">
               <button type="submit" class="btn btn-primary">Add Driver</button>
               <a href="{% url 'driver' %}" class="btn btn-secondary">Cancel</a>

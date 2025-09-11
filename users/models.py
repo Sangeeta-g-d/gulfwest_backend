@@ -57,9 +57,26 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     profile = models.ImageField(upload_to='profile/', blank=True, null=True)
+    PROVINCE_CHOICES = [
+        ("Riyadh", "Riyadh"),
+        ("Makkah", "Makkah"),
+        ("Madinah", "Madinah"),
+        ("Qassim", "Qassim"),
+        ("Eastern Province", "Eastern Province"),
+        ("Asir", "Asir"),
+        ("Tabuk", "Tabuk"),
+        ("Hail", "Hail"),
+        ("Northern Borders", "Northern Borders"),
+        ("Jizan", "Jizan"),
+        ("Najran", "Najran"),
+        ("Al-Bahah", "Al-Bahah"),
+        ("Al-Jawf", "Al-Jawf"),
+    ]
 
+    province = models.CharField(
+        max_length=50, choices=PROVINCE_CHOICES, null=True, blank=True
+    )
     objects = CustomUserManager()
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 

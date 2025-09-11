@@ -26,7 +26,7 @@
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Phone Number</th>
-          
+                <th>Province</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -44,6 +44,7 @@
     <td>{{ x.name }}</td>
     <td>{{ x.email }}</td>
     <td>{{ x.phone_number }}</td>
+    <td>{{ x.province }}</td>
   
     <td>
       <a href="{% url 'edit_driver' x.id %}" class="btn btn-sm btn-dark" title="Edit">

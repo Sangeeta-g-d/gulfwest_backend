@@ -6,7 +6,7 @@ import firebase_admin
 from firebase_admin import credentials
 
 def login_required_nocache(view_func):
-    return login_required(never_cache(view_func), login_url='/login/')
+    return login_required(never_cache(view_func), login_url='/')
 
 
 def initialize_firebase():

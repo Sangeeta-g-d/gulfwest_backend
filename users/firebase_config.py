@@ -11,7 +11,7 @@ def initialize_firebase():
         if not firebase_admin._apps:
             # Get absolute path to service account file
             BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            service_account_path = os.path.join(BASE_DIR, 'serviceAccountKey.json')
+            service_account_path = os.path.join(BASE_DIR, 'firebase_service_key.json')
             
             if not os.path.exists(service_account_path):
                 raise FileNotFoundError(f"Service account file not found at {service_account_path}")

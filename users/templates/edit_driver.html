@@ -28,27 +28,45 @@
             </div>
 
             <div class="row">
-              <!-- Phone -->
-              <div class="col-md-6 form-group mb-3">
-                <label>Phone Number</label>
-                <input type="text" name="phone_number" class="form-control" placeholder="Enter phone number"
-                  value="{{ driver.phone_number }}">
-              </div>
+  <!-- Phone -->
+  <div class="col-md-6 form-group mb-3">
+    <label>Phone Number</label>
+    <input type="text" name="phone_number" class="form-control" placeholder="Enter phone number"
+      value="{{ driver.phone_number }}">
+  </div>
 
-              <!-- City -->
-             
+  <!-- Province -->
+  <div class="col-md-6 form-group mb-3">
+    <label>Province</label>
+    <select name="province" class="form-control" required>
+      <option value="" disabled>Select Province</option>
+      <option value="Riyadh" {% if driver.province == "Riyadh" %}selected{% endif %}>Riyadh</option>
+      <option value="Makkah" {% if driver.province == "Makkah" %}selected{% endif %}>Makkah</option>
+      <option value="Madinah" {% if driver.province == "Madinah" %}selected{% endif %}>Madinah</option>
+      <option value="Qassim" {% if driver.province == "Qassim" %}selected{% endif %}>Qassim</option>
+      <option value="Eastern Province" {% if driver.province == "Eastern Province" %}selected{% endif %}>Eastern Province</option>
+      <option value="Asir" {% if driver.province == "Asir" %}selected{% endif %}>Asir</option>
+      <option value="Tabuk" {% if driver.province == "Tabuk" %}selected{% endif %}>Tabuk</option>
+      <option value="Hail" {% if driver.province == "Hail" %}selected{% endif %}>Hail</option>
+      <option value="Northern Borders" {% if driver.province == "Northern Borders" %}selected{% endif %}>Northern Borders</option>
+      <option value="Jizan" {% if driver.province == "Jizan" %}selected{% endif %}>Jizan</option>
+      <option value="Najran" {% if driver.province == "Najran" %}selected{% endif %}>Najran</option>
+      <option value="Al-Bahah" {% if driver.province == "Al-Bahah" %}selected{% endif %}>Al-Bahah</option>
+      <option value="Al-Jawf" {% if driver.province == "Al-Jawf" %}selected{% endif %}>Al-Jawf</option>
+    </select>
+  </div>
 
-              <!-- Profile Image -->
-              <div class="col-md-6 form-group mb-3">
-                <label>Profile Image</label>
-                <input type="file" name="profile" class="form-control">
-                {% if driver.profile %}
-                  <img src="{{ driver.profile.url }}" alt="Profile" class="mt-2" width="60" height="60">
-                {% else %}
-                  <p class="text-muted mt-2">No profile image uploaded.</p>
-                {% endif %}
-              </div>
-            </div>
+  <!-- Profile Image -->
+  <div class="col-md-6 form-group mb-3">
+    <label>Profile Image</label>
+    <input type="file" name="profile" class="form-control">
+    {% if driver.profile %}
+      <img src="{{ driver.profile.url }}" alt="Profile" class="mt-2" width="60" height="60">
+    {% else %}
+      <p class="text-muted mt-2">No profile image uploaded.</p>
+    {% endif %}
+  </div>
+</div>
 
             <div class="form-group mb-3">
               <button type="submit" class="btn btn-primary">Update Driver</button>

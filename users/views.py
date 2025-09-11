@@ -244,7 +244,7 @@ def reset_password_view(request, uidb64, token):
 
 def logout_view(request):
     logout(request)
-    return redirect('/login/')
+    return redirect('/')
 
 @login_required_nocache
 def admin_dashboard(request):
@@ -961,33 +961,30 @@ def add_driver(request):
     if request.method == 'POST':
         full_name = request.POST.get('full_name')
         email = request.POST.get('email')
-        country_code = request.POST.get('country_code')  # Get country code
+        country_code = request.POST.get('country_code')
         phone = request.POST.get('phone_number')
         profile = request.FILES.get('profile')
+        province = request.POST.get('province')  # NEW
 
-        # Combine country code and phone number
         phone_number = f"{country_code}{phone}".replace(" ", "").replace("-", "")
-        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", phone_number)
 
-        # Check for duplicate email
         if CustomUser.objects.filter(email=email).exists():
             return redirect('/add_driver/?status=email_exists')
 
-        # Check for duplicate phone number
         if CustomUser.objects.filter(phone_number=phone_number).exists():
             return redirect('/add_driver/?status=phone_exists')
 
-        # Create new user with phone number as password
         user = CustomUser.objects.create(
             name=full_name,
             email=email,
             phone_number=phone_number,
             profile=profile,
             role='driver',
+            province=province,   # NEW
             is_active=True,
             is_staff=False,
         )
-        user.set_password(phone_number)  # Set phone number as password
+        user.set_password(phone_number)
         user.save()
 
         return redirect('/driver/?status=added')
@@ -1003,6 +1000,7 @@ def edit_driver(request, driver_id):
         driver.email = request.POST.get('email')
         driver.phone_number = request.POST.get('phone_number')
         driver.city = request.POST.get('city')
+        driver.province = request.POST.get('province')  # NEW
 
         if request.FILES.get('profile'):
             driver.profile = request.FILES.get('profile')
