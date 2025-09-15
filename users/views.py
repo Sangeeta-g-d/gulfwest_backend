@@ -1418,3 +1418,11 @@ def delete_onboarding_image(request, pk):
     image.image.delete()  # delete file from storage
     image.delete()        # delete database entry
     return redirect('/onboarding-images/?status=deleted')
+
+
+def privacy(request):
+    return render(request,'privacy.html')
+
+
+def terms(request):
+    return render(request,'terms.html')

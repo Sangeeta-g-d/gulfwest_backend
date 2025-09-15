@@ -10,6 +10,8 @@ urlpatterns = [
     path('delete-user/<int:user_id>/', views.delete_user, name='delete_user'),
     path('staff_details/',views.staff_details, name='staff_details'),
     path('add_staff/',views.add_staff, name='add_staff'),
+    path("privacy/",views.privacy,name="privacy"),
+    path("terms/",views.terms,name="terms"),
 
     path('add_category/', views.add_category, name='add_category'),
     path('category-toggle/<int:category_id>/', views.toggle_category_status, name='toggle_category_status'),
