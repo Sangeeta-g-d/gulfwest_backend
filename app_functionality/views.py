@@ -129,7 +129,10 @@ class UserCartAPIView(ListAPIView):
             return round(effective_price * item.quantity, 2)
 
         total_price = sum(calculate_effective_price(item) for item in queryset)
-
+        vat_obj = VAT.objects.order_by('-id').first()
+        vat_percent = float(vat_obj.value) if vat_obj else 0.0
+        vat_amount = round((total_price * vat_percent) / 100, 2)
+        total_with_vat = round(total_price + vat_amount, 2)
         return Response({
             'success': True,
             'cart_items': serializer.data,
@@ -137,6 +140,9 @@ class UserCartAPIView(ListAPIView):
                 'total_items': total_items,
                 'total_unique_items': queryset.count(),
                 'total_price': round(total_price, 2),
+                'vat_percent': vat_percent,
+                'vat_amount': vat_amount,
+                'grand_total': total_with_vat   
             }
         })
 

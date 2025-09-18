@@ -326,3 +326,10 @@ class OnboardingImage(models.Model):
 
     def __str__(self):
         return self.title or f"OnboardingImage {self.id}"
+
+
+class VAT(models.Model):
+    value = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+
+    def __str__(self):
+        return f"{self.value}%"

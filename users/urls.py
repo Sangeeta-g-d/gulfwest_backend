@@ -43,6 +43,7 @@ urlpatterns = [
     path('edit_staff_details/<int:staff_id>/', views.edit_staff_details, name='edit_staff_details'),
     path('delete_staff/<int:staff_id>/', views.delete_staff, name='delete_staff'),
     path('add-role/', views.add_role, name='add_role'),
+    path('manage_vat/',views.manage_vat,name="manage_vat"),
 
     # flash sale
     path('add_flash_sale/',views.add_flash_sale,name="add_flash_sale"),

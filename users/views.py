@@ -1426,3 +1426,18 @@ def privacy(request):
 
 def terms(request):
     return render(request,'terms.html')
+
+@login_required_nocache
+def manage_vat(request):
+    vat = VAT.objects.first()
+    if request.method == "POST":
+        value = request.POST.get("vat_value")
+        if vat:
+            vat.value = value
+            vat.save()
+            return JsonResponse({"message": "VAT updated successfully."})
+        else:
+            VAT.objects.create(value=value)
+            return JsonResponse({"message": "VAT added successfully."})
+
+    return JsonResponse({"message": "Invalid request"}, status=400)

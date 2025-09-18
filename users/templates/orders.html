@@ -317,35 +317,50 @@
         </div>
 
         <!-- Order Total -->
-        <div class="text-right mt-3">
-          <p><strong>Original Total (Before Any Discounts):</strong>
-            <img src="/static/assets/img/currency.svg" alt="Rupee"
-                 style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
-            {{ order.original_total }}
-          </p>
-          <p><strong>Product/Flash Discounts:</strong>
-            <img src="/static/assets/img/currency.svg" alt="Rupee"
-                 style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
-            {{ order.product_discount_total|floatformat:2 }}
-          </p>
+       <!-- Order Total -->
+<div class="text-right mt-3">
+  <p><strong>Original Total (Before Any Discounts):</strong>
+    <img src="/static/assets/img/currency.svg" alt="Rupee"
+         style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+    {{ order.original_total }}
+  </p>
+  <p><strong>Product/Flash Discounts:</strong>
+    <img src="/static/assets/img/currency.svg" alt="Rupee"
+         style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+    {{ order.product_discount_total|floatformat:2 }}
+  </p>
 
-          {% if order.promo_code %}
-            <p><strong>Promo Code ({{ order.promo_code.code }}):</strong> -
-              <img src="/static/assets/img/currency.svg" alt="Rupee"
-                   style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
-              {{ order.discount|floatformat:2 }}
-              ({{ order.promo_code.get_discount_type_display }})
-            </p>
-          {% endif %}
+  {% if order.promo_code %}
+    <p><strong>Promo Code ({{ order.promo_code.code }}):</strong> -
+      <img src="/static/assets/img/currency.svg" alt="Rupee"
+           style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+      {{ order.discount|floatformat:2 }}
+      ({{ order.promo_code.get_discount_type_display }})
+    </p>
+  {% endif %}
 
-          <p><strong>Final Payable Amount:</strong>
-            <span class="text-success font-weight-bold">
-              <img src="/static/assets/img/currency.svg" alt="Rupee"
-                   style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
-              {{ order.final_total|floatformat:2 }}
-            </span>
-          </p>
-        </div>
+  <p><strong>Final Payable Amount (Before VAT):</strong>
+    <span class="text-success font-weight-bold">
+      <img src="/static/assets/img/currency.svg" alt="Rupee"
+           style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
+      {{ order.final_total|floatformat:2 }}
+    </span>
+  </p>
+
+  {% if order.total_including_tax %}
+    <p><strong>VAT Applied:</strong>
+      {{ order.total_including_tax|floatformat:2|add:"-"|slice:":-1" |default:"" }}
+      <!-- you can also show the VAT % if stored -->
+    </p>
+    <p><strong>Total Including VAT:</strong>
+      <span class="text-primary font-weight-bold">
+        <img src="/static/assets/img/currency.svg" alt="Rupee"
+             style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(64%) saturate(3382%) hue-rotate(88deg) brightness(95%) contrast(98%);">
+        {{ order.total_including_tax|floatformat:2 }}
+      </span>
+    </p>
+  {% endif %}
+</div>
 
       </div>
 

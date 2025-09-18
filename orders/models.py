@@ -24,6 +24,7 @@ class Order(models.Model):
     original_total = models.DecimalField(max_digits=10, decimal_places=2)
     discount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     final_total = models.DecimalField(max_digits=10, decimal_places=2)
+    total_including_tax = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
 
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     payment_type = models.CharField(max_length=29, choices=PAYMENT_CHOICES, default="POS")

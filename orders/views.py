@@ -6,6 +6,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 from django.db import transaction
 from django.utils import timezone
+from users.models import VAT
 from decimal import Decimal
 from django.shortcuts import get_object_or_404
 from .models import Order, OrderItem
@@ -60,6 +61,13 @@ class ConfirmOrderView(APIView):
 
         final_total = original_total - discount
 
+        # ✅ Fetch VAT value (default 0 if none exists)
+        vat = VAT.objects.first()
+        vat_percent = vat.value if vat else Decimal('0')
+        vat_amount = (final_total * vat_percent) / 100
+        total_including_tax = final_total + vat_amount
+
+        # Create order with VAT-inclusive total
         order = Order.objects.create(
             user=user,
             address_id=address_id,
@@ -67,6 +75,7 @@ class ConfirmOrderView(APIView):
             original_total=original_total,
             discount=discount,
             final_total=final_total,
+            total_including_tax=total_including_tax,  # ✅ new field
             payment_type=payment_type,
             placed_at=timezone.now(),
         )
@@ -85,7 +94,6 @@ class ConfirmOrderView(APIView):
         if promo_code:
             PromoCodeUsage.objects.create(user=user, promo_code=promo_code)
 
-        # Clear the cart
         cart.items.all().delete()
 
         return Response({
@@ -93,7 +101,9 @@ class ConfirmOrderView(APIView):
             'order_id': order.id,
             'original_total': str(original_total),
             'discount': str(discount),
-            'final_total': str(final_total)
+            'final_total': str(final_total),
+            'vat_percent': str(vat_percent),
+            'total_including_tax': str(total_including_tax)
         }, status=status.HTTP_201_CREATED)
     
 

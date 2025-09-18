@@ -104,8 +104,15 @@
   </div>
   <a href="{% url 'admin_dashboard' %}" class="btn btn-sm btn-secondary ml-2">Reset</a>
 </form>
+
+
     </div>
   </div>
+</div>
+<div class="d-flex justify-content-end mb-3">
+  <button class="btn btn-dark btn-sm" data-toggle="modal" data-target="#vatModal">
+    <i class="fas fa-percent"></i> Manage VAT
+  </button>
 </div>
 
   <!-- Row: Order Chart + Top Products -->
@@ -193,5 +200,84 @@
   </div>
 
 </div>
+
+
+<!-- VAT Modal -->
+<!-- VAT Modal -->
+<!-- VAT Modal -->
+<div class="modal fade" id="vatModal" tabindex="-1" aria-labelledby="vatModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <form id="vatForm" method="post">
+      {% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="vatModalLabel">
+            {% if vat_value %} Edit VAT {% else %} Add VAT {% endif %}
+          </h5>
+          <button type="button" class="btn" data-bs-dismiss="modal">X</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="form-group mb-2">
+            <label for="vat_value">VAT (%)</label>
+            <input type="number" step="0.01" min="0" 
+                   class="form-control" 
+                   name="vat_value" 
+                   id="vat_value" 
+                   value="{{ vat_value|default:'' }}" 
+                   required>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">
+            {% if vat_value %} Update {% else %} Save {% endif %}
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+document.getElementById("vatForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+
+    const formData = new FormData(this);
+
+    fetch("{% url 'manage_vat' %}", {
+        method: "POST",
+        headers: {
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        $('#vatModal').modal('hide'); // close modal
+        Toastify({
+            text: data.message,
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#28a745"
+        }).showToast();
+        setTimeout(() => location.reload(), 1200); // reload to update dashboard
+    })
+    .catch(err => {
+        Toastify({
+            text: "Error saving VAT",
+            duration: 3000,
+            close: true,
+            gravity: "top",
+            position: "right",
+            backgroundColor: "#dc3545"
+        }).showToast();
+    });
+});
+</script>
+
 
 {% endblock %}
