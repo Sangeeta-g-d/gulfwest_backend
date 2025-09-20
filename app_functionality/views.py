@@ -292,7 +292,6 @@ class EditAddressAPIView(APIView):
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
 class CartTotalAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -341,11 +340,21 @@ class CartTotalAPIView(APIView):
                     "total_price": total_item_price
                 })
 
+            # Get VAT percent
+            from users.models import VAT
+            vat_obj = VAT.objects.order_by('-id').first()
+            vat_percent = float(vat_obj.value) if vat_obj else 0.0
+            vat_amount = round((total_price * vat_percent) / 100, 2)
+            grand_total = round(total_price + vat_amount, 2)
+
             return Response({
                 "message": "Cart total fetched successfully",
                 "total_items": total_items,
                 "total_price": round(total_price, 2),
-                "items": items_data
+                "vat_percent": vat_percent,
+                "vat_amount": vat_amount,
+                "grand_total": grand_total,
+                "items": items_data,
             }, status=status.HTTP_200_OK)
 
         except Cart.DoesNotExist:
@@ -353,6 +362,9 @@ class CartTotalAPIView(APIView):
                 "message": "Cart not found",
                 "total_items": 0,
                 "total_price": 0.00,
+                "vat_percent": 0.0,
+                "vat_amount": 0.0,
+                "grand_total": 0.0,
                 "items": []
             }, status=status.HTTP_200_OK)
 
