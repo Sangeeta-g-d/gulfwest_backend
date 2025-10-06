@@ -26,7 +26,7 @@ urlpatterns = [
    path("save-device-token/", SaveDeviceTokenAPIView.as_view(), name="save_device_token"),
 
    # banner image
-   path('dashboard-banner/', dashboard_banner_api, name='dashboard_banner_api'),
+   path('banner/', dashboard_banner_api, name='dashboard_banner_api'),
 
 ]
 
