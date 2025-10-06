@@ -1460,30 +1460,29 @@ def privacy(request):
 
 def terms(request):
     return render(request,'terms.html')
-
-# ✅ Manage Banner
 def manage_banner(request):
     banner = DashboardBanner.objects.first()
 
     if request.method == "POST":
         image = request.FILES.get('banner_image')
-
         if not image:
             return JsonResponse({"message": "Please select an image."}, status=400)
 
-        if banner:
-            banner.image = image
-            banner.save()
-            message = "Banner image updated successfully!"
-        else:
-            DashboardBanner.objects.create(image=image)
-            message = "Banner image added successfully!"
+        try:
+            if banner:
+                banner.image = image
+                banner.save()
+                message = "Banner image updated successfully!"
+            else:
+                DashboardBanner.objects.create(image=image)
+                message = "Banner image added successfully!"
+        except Exception as e:
+            return JsonResponse({"message": f"Error: {str(e)}"}, status=500)
 
         return JsonResponse({"message": message})
 
     # GET request
     return render(request, "admin_dashboard.html", {"banner": banner})
-
 
 # ✅ Manage VAT
 def manage_vat(request):

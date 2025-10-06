@@ -336,30 +336,35 @@ document.getElementById("vatForm").addEventListener("submit", function(e) {
  <script>
 document.getElementById("bannerForm").addEventListener("submit", function(e) {
     e.preventDefault();
-
     const formData = new FormData(this);
 
     fetch("{% url 'manage_banner' %}", {
         method: "POST",
         headers: {
-            "X-CSRFToken": formData.get("csrfmiddlewaretoken")
+            "X-CSRFToken": formData.get("csrfmiddlewaretoken"),
+            "X-Requested-With": "XMLHttpRequest"  // optional but good
         },
         body: formData
     })
     .then(res => res.json())
     .then(data => {
-        $('#bannerModal').modal('hide');
+        // Close modal properly
+        const modalEl = document.getElementById('bannerModal');
+        const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modal.hide();
+
         Toastify({
             text: data.message,
             duration: 3000,
             close: true,
             gravity: "top",
             position: "right",
-    style: {
-      background: "white",
-      color: "black",
-    },
+            style: {
+                background: "white",
+                color: "black",
+            },
         }).showToast();
+
         setTimeout(() => location.reload(), 1200);
     })
     .catch(err => {
@@ -369,13 +374,14 @@ document.getElementById("bannerForm").addEventListener("submit", function(e) {
             close: true,
             gravity: "top",
             position: "right",
-              style: {
-      background: "white",
-      color: "black",
-    },
+            style: {
+                background: "white",
+                color: "black",
+            },
         }).showToast();
     });
 });
+
 </script>
 
 
