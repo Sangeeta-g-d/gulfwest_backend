@@ -165,6 +165,13 @@ def upload_bulk_products(request, id):
 
 
 def login_view(request):
+    if request.user.is_authenticated:
+        if request.user.is_superuser:
+            return redirect('/admin_dashboard/')
+        if request.user.role == 'staff':
+            return redirect('/staff_dashboard')
+        else:
+            return redirect('/')
     error_msg = None
     if request.method == "POST":
         username = request.POST.get("username")

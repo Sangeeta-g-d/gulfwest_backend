@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db.models import Sum
 from .serializers import *
+from rest_framework.decorators import api_view
 from orders.models import *
 import random
 from django.db.models import Q
@@ -371,3 +372,16 @@ class SaveDeviceTokenAPIView(APIView):
         DeviceToken.objects.get_or_create(user=request.user, token=d_token)
 
         return Response({"message": "Token saved successfully"})
+
+
+# banner image
+@api_view(['GET'])
+def dashboard_banner_api(request):
+    # Fetch the latest banner
+    banner = DashboardBanner.objects.order_by('-updated_at').first()
+    
+    if banner:
+        serializer = DashboardBannerSerializer(banner, context={'request': request})
+        return Response({"status": "success", "banner": serializer.data})
+    else:
+        return Response({"status": "success", "banner": None})
