@@ -297,7 +297,8 @@ def admin_dashboard(request):
     buf1.seek(0)
     order_status_chart = base64.b64encode(buf1.read()).decode('utf-8')
     plt.close(fig1)
-
+    vat = VAT.objects.first()
+    banner = DashboardBanner.objects.first()
     context = {
         'current_url_name': current_url_name,
         'total_orders': total_orders,
@@ -311,6 +312,8 @@ def admin_dashboard(request):
         'orders_count': orders_count,
         'selected_date': selected_date,
         'today': today,
+        "vat_value": vat.value if vat else None,
+        "banner": banner,
     }
 
     return render(request, 'admin_dashboard.html', context)
@@ -1427,17 +1430,49 @@ def privacy(request):
 def terms(request):
     return render(request,'terms.html')
 
-@login_required_nocache
+# ✅ Manage Banner
+def manage_banner(request):
+    banner = DashboardBanner.objects.first()
+
+    if request.method == "POST":
+        image = request.FILES.get('banner_image')
+
+        if not image:
+            return JsonResponse({"message": "Please select an image."}, status=400)
+
+        if banner:
+            banner.image = image
+            banner.save()
+            message = "Banner image updated successfully!"
+        else:
+            DashboardBanner.objects.create(image=image)
+            message = "Banner image added successfully!"
+
+        return JsonResponse({"message": message})
+
+    # GET request
+    return render(request, "admin_dashboard.html", {"banner": banner})
+
+
+# ✅ Manage VAT
 def manage_vat(request):
     vat = VAT.objects.first()
+
     if request.method == "POST":
         value = request.POST.get("vat_value")
+
+        if not value:
+            return JsonResponse({"message": "Please enter a valid VAT value."}, status=400)
+
         if vat:
             vat.value = value
             vat.save()
-            return JsonResponse({"message": "VAT updated successfully."})
+            message = "VAT updated successfully."
         else:
             VAT.objects.create(value=value)
-            return JsonResponse({"message": "VAT added successfully."})
+            message = "VAT added successfully."
 
+        return JsonResponse({"message": message})
+
+    # GET request
     return JsonResponse({"message": "Invalid request"}, status=400)

@@ -76,4 +76,7 @@ urlpatterns = [
 
     path('onboarding-images/',views.onboarding_images,name="onboarding_images"),
     path('delete_onboarding_image/<int:pk>/', views.delete_onboarding_image, name='delete_onboarding_image'),
+
+
+    path('manage_banner/', views.manage_banner, name='manage_banner'),
 ]

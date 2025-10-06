@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'django_extensions',
     'driver_app',
     'rest_framework_simplejwt.token_blacklist',
+    'django.contrib.humanize'
     
 ]
 
