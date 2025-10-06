@@ -3,6 +3,7 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib import messages
 from django.urls import resolve
 from django.core.paginator import Paginator
+from PIL import Image
 from firebase_admin.exceptions import FirebaseError
 from .utils import login_required_nocache 
 from django.contrib.auth.decorators import login_required
@@ -345,18 +346,41 @@ def delete_user(request, user_id):
         return redirect('/customers/?status=deleted')
     except:
         return redirect('/customers/?status=delete_failed')
-    
+
+
 @login_required_nocache
 def add_category(request):
     if request.method == "POST":
         category_name = request.POST.get('category')
         background_img = request.FILES.get('background_img')
-        if category_name:
-            Categories.objects.create(category_name=category_name, background_img=background_img)
-            return JsonResponse({'status': 'success', 'message': 'Category added successfully'})
-        else:
+
+        if not category_name:
             return JsonResponse({'status': 'error', 'message': 'Category name cannot be empty'})
+
+        if not background_img:
+            return JsonResponse({'status': 'error', 'message': 'Please upload an image.'})
+
+        # Validate image dimensions
+        try:
+            img = Image.open(background_img)
+            width, height = img.size
+            if width != 463 or height != 563:
+                return JsonResponse({
+                    'status': 'error',
+                    'message': 'Image must be exactly 463px by 563px.'
+                })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': 'Invalid image file.'
+            })
+
+        # Save category if all checks pass
+        Categories.objects.create(category_name=category_name, background_img=background_img)
+        return JsonResponse({'status': 'success', 'message': 'Category added successfully'})
+
     return JsonResponse({'status': 'error', 'message': 'Invalid request'}, status=400)
+
 
 @login_required
 def toggle_category_status(request, category_id):
