@@ -207,26 +207,30 @@ class FlashSale(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
-    # Apply either to selected categories or selected products
-    categories = models.ManyToManyField(Categories, blank=True, related_name='flash_sales')
+    categories = models.ManyToManyField('Categories', blank=True, related_name='flash_sales')
     products = models.ManyToManyField('Product', blank=True, related_name='flash_sales')
     background_image = models.ImageField(upload_to='flash_sale_backgrounds/', blank=True, null=True)
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(default=False, editable=False)  # <- no manual editing
 
     def __str__(self):
         return f"{self.name} ({self.discount_percentage}% off)"
 
-    def is_currently_active(self):
-        from django.utils import timezone
+    @property
+    def currently_active(self):
         now = timezone.now()
-        return self.is_active and self.start_time <= now <= self.end_time
+        return self.start_time <= now <= self.end_time
+
+    def save(self, *args, **kwargs):
+        now = timezone.now()
+        # Automatically set is_active
+        self.is_active = self.start_time <= now <= self.end_time
+        super().save(*args, **kwargs)
 
     def get_applicable_products(self):
         from users.models import Product
         if self.categories.exists():
             return Product.objects.filter(category__in=self.categories.all(), is_active=True, deleted=False)
         return self.products.filter(is_active=True, deleted=False)
-
 
 class ProductRating(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, related_name='ratings')

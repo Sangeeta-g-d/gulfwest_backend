@@ -55,7 +55,7 @@
             </div>
 
             <div class="row">
-              <div class="col-md-6 form-group mb-3">
+              <div class="col-md-12 form-group mb-3">
                 <label>Apply To</label>
                 <select class="form-control" name="apply_type" id="applyType" required>
                   <option value="">-- Select --</option>
@@ -64,13 +64,7 @@
                 </select>
               </div>
 
-              <div class="col-md-6 form-group mb-3">
-                <label>Status</label>
-                <select name="is_active" class="form-control">
-                  <option value="1" {% if sale.is_active %}selected{% endif %}>Active</option>
-                  <option value="0" {% if not sale.is_active %}selected{% endif %}>Inactive</option>
-                </select>
-              </div>
+           
             </div>
 
             <!-- Category Selection -->

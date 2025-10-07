@@ -854,7 +854,6 @@ def add_flash_sale(request):
         start_time_str = request.POST.get("start_time")  # e.g. '2025-06-09T12:10'
         end_time_str = request.POST.get("end_time")      # e.g. '2025-06-11T11:12'
         apply_type = request.POST.get("apply_type")
-        is_active = request.POST.get("is_active") == '1'
         tagline = request.POST.get('tagline')
         background_image = request.FILES.get('background_image')
 
@@ -879,7 +878,6 @@ def add_flash_sale(request):
             discount_percentage=discount_percentage,
             start_time=start_time_utc,
             end_time=end_time_utc,
-            is_active=is_active,
             tagline=tagline,
             background_image=background_image
         )
@@ -933,8 +931,6 @@ def edit_flash_sale(request, sale_id):
         # Convert to UTC
         sale.start_time = start_time_ist.astimezone(pytz.UTC)
         sale.end_time = end_time_ist.astimezone(pytz.UTC)
-
-        sale.is_active = 'is_active' in request.POST
 
         # Handle optional image upload
         if 'background_image' in request.FILES:
