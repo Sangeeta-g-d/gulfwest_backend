@@ -339,7 +339,7 @@
     </p>
   {% endif %}
 
-  <p><strong>Final Payable Amount (Before VAT):</strong>
+  <p><strong>Total Taxable Amount:(Before VAT):</strong>
     <span class="text-success font-weight-bold">
       <img src="/static/assets/img/currency.svg" alt="Rupee"
            style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
@@ -348,11 +348,12 @@
   </p>
 
   {% if order.total_including_tax %}
-    <p><strong>VAT Applied:</strong>
+    <p><strong>VAT Amount(15%):
+</strong>
       {{ order.total_including_tax|floatformat:2|add:"-"|slice:":-1" |default:"" }}
       <!-- you can also show the VAT % if stored -->
     </p>
-    <p><strong>Total Including VAT:</strong>
+    <p><strong>Total with VAT:</strong>
       <span class="text-primary font-weight-bold">
         <img src="/static/assets/img/currency.svg" alt="Rupee"
              style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(64%) saturate(3382%) hue-rotate(88deg) brightness(95%) contrast(98%);">
