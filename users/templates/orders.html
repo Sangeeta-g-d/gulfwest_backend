@@ -319,12 +319,12 @@
         <!-- Order Total -->
        <!-- Order Total -->
 <div class="text-right mt-3">
-  <p><strong>Original Total (Before Any Discounts):</strong>
+  <p><strong>Total Product Value:</strong>
     <img src="/static/assets/img/currency.svg" alt="Rupee"
          style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
     {{ order.original_total }}
   </p>
-  <p><strong>Product/Flash Discounts:</strong>
+  <p><strong>Discount:</strong>
     <img src="/static/assets/img/currency.svg" alt="Rupee"
          style="width: 14px; height: 14px; margin-right: 3px; filter: invert(28%) sepia(0%) saturate(0%) hue-rotate(0deg) brightness(93%) contrast(89%);">
     {{ order.product_discount_total|floatformat:2 }}
