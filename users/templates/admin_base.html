@@ -131,21 +131,7 @@
       </a>
     </li>
 
-    <!-- Add Products -->
-    <li class="nav-item {% if current_url_name == 'add-products' %}active{% endif %}">
-      <a class="nav-link" href="/add_product/">
-        <i class="fas fa-plus-square"></i>
-        <span>Add Products</span>
-      </a>
-    </li>
-
     <!-- Excel Import -->
-    <li class="nav-item {% if current_url_name == 'excel' %}active{% endif %}">
-      <a class="nav-link" href="/products/">
-        <i class="fas fa-file-excel"></i>
-        <span>Import from Excel</span>
-      </a>
-    </li>
 
     <!-- Flash Sale -->
     <li class="nav-item {% if current_url_name == 'flash_sale' %}active{% endif %}">
@@ -160,6 +146,12 @@
       <a class="nav-link" href="/promo_code/">
         <i class="fas fa-ticket-alt"></i>
         <span>Promo Code</span>
+      </a>
+    </li>
+     <li class="nav-item {% if current_url_name == 'onboarding_images' %}active{% endif %}">
+      <a class="nav-link" href="/onboarding-images/">
+        <i class="fas fa-image"></i>
+        <span>Onboarding Image</span>
       </a>
     </li>
   {% endif %}
@@ -184,13 +176,13 @@
 
   {% if request.user.is_superuser %}
     <!-- Staff -->
-   <li class="nav-item {% if current_url_name == 'onboarding_images' %}active{% endif %}">
-      <a class="nav-link" href="/onboarding-images/">
-        <i class="fas fa-image"></i>
-        <span>Onboarding Image</span>
+       <!-- Add Products -->
+    <li class="nav-item {% if current_url_name == 'add-products' %}active{% endif %}">
+      <a class="nav-link" href="/add_product/">
+        <i class="fas fa-plus-square"></i>
+        <span>Add Products</span>
       </a>
     </li>
-
     <li class="nav-item {% if current_url_name == 'staff' %}active{% endif %}">
       <a class="nav-link" href="/staff_details/">
         <i class="fas fa-users-cog"></i>
@@ -203,6 +195,12 @@
       <a class="nav-link" href="/customers/">
         <i class="fas fa-user"></i>
         <span>Customers</span>
+      </a>
+    </li>
+       <li class="nav-item {% if current_url_name == 'excel' %}active{% endif %}">
+      <a class="nav-link" href="/products/">
+        <i class="fas fa-file-excel"></i>
+        <span>Import from Excel</span>
       </a>
     </li>
   {% endif %}
