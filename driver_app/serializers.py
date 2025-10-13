@@ -15,7 +15,7 @@ class DriverOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = [
-            'id', 'status', 'final_total', 'payment_type', 'placed_at', 'customer_name',
+            'id', 'status', 'total_including_tax', 'payment_type', 'placed_at', 'customer_name',
             'delivery_name', 'delivery_phone', 'delivery_address', 'delivery_city'
         ]
 
@@ -49,7 +49,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'variant_name', 'quantity', 'price', 'total_price', 'product_image']
+        fields = ['id', 'variant_name', 'quantity', 'price', 'total_including_tax', 'product_image']
 
     def get_variant_name(self, obj):
         return str(obj.variant) if obj.variant else "N/A"
