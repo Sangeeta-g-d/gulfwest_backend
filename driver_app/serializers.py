@@ -3,7 +3,6 @@ from orders.models import Order,OrderItem
 from django.utils.timezone import localtime
 from app_functionality.models import Address
 import pytz
-
 class DriverOrderSerializer(serializers.ModelSerializer):
     customer_name = serializers.SerializerMethodField()
     placed_at = serializers.SerializerMethodField()
@@ -11,12 +10,14 @@ class DriverOrderSerializer(serializers.ModelSerializer):
     delivery_phone = serializers.SerializerMethodField()
     delivery_address = serializers.SerializerMethodField()
     delivery_city = serializers.SerializerMethodField()
+    final_total = serializers.SerializerMethodField()  # override value
 
     class Meta:
         model = Order
         fields = [
-            'id', 'status', 'total_including_tax', 'payment_type', 'placed_at', 'customer_name',
-            'delivery_name', 'delivery_phone', 'delivery_address', 'delivery_city'
+            'id', 'status', 'final_total', 'payment_type', 'placed_at',
+            'customer_name', 'delivery_name', 'delivery_phone',
+            'delivery_address', 'delivery_city'
         ]
 
     def get_customer_name(self, obj):
@@ -42,6 +43,9 @@ class DriverOrderSerializer(serializers.ModelSerializer):
     def get_delivery_city(self, obj):
         return obj.address.city if obj.address else ""
 
+    # ✅ Use total_including_tax as the value for final_total
+    def get_final_total(self, obj):
+        return obj.total_including_tax
 
 class OrderItemSerializer(serializers.ModelSerializer):
     variant_name = serializers.SerializerMethodField()
@@ -49,7 +53,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = ['id', 'variant_name', 'quantity', 'price', 'total_including_tax', 'product_image']
+        fields = ['id', 'variant_name', 'quantity', 'price', 'total_price', 'product_image']
 
     def get_variant_name(self, obj):
         return str(obj.variant) if obj.variant else "N/A"
@@ -77,6 +81,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     address = AddressSerializer(read_only=True)
     customer_name = serializers.SerializerMethodField()
     placed_at = serializers.SerializerMethodField()
+    final_total = serializers.SerializerMethodField()  # override value
 
     class Meta:
         model = Order
@@ -91,3 +96,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
     def get_placed_at(self, obj):
         ist = pytz.timezone("Asia/Kolkata")
         return localtime(obj.placed_at, timezone=ist).strftime("%d-%m-%Y %I:%M %p")
+
+    # ✅ Use total_including_tax for final_total field
+    def get_final_total(self, obj):
+        return obj.total_including_tax
