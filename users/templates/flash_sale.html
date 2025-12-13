@@ -78,7 +78,8 @@
         <div class="card-body bg-light overflow-auto" style="flex: 1 1 auto;">
           <h5 class="card-title font-weight-bold">{{ sale.name }}</h5>
           <p class="card-text text-muted">{{ sale.tagline }}</p>
-            {% timezone "Asia/Kolkata" %}
+            {% timezone "Asia/Riyadh" %}
+
             <p class="card-text">
               <strong>Discount:</strong> {{ sale.discount_percentage }}%<br>
               <strong>Start:</strong> {{ sale.start_time|date:"M d, Y H:i" }} <br>

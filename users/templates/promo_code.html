@@ -70,9 +70,9 @@
             Unlimited
           {% endif %}
         </td>
-        <td>
-  {{ promo.start_time|timezone:"Asia/Kolkata"|date:"Y-m-d H:i" }} <br> to <br>
-  {{ promo.end_time|timezone:"Asia/Kolkata"|date:"Y-m-d H:i" }}
+       <td>
+  {{ promo.start_time|timezone:"Asia/Riyadh"|date:"Y-m-d H:i" }} <br> to <br>
+  {{ promo.end_time|timezone:"Asia/Riyadh"|date:"Y-m-d H:i" }}
 </td>
         <td>
           {% if promo.is_active %}

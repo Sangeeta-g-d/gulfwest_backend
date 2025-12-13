@@ -300,34 +300,36 @@ class CartTotalAPIView(APIView):
             cart = Cart.objects.get(user=request.user)
             items_data = []
             total_items = 0
-            total_price = 0.0
-            now = timezone.now()
+            total_price = Decimal('0.00')
+
+            # Use UTC now for comparisons
+            now_utc = timezone.now()
 
             for item in cart.items.select_related('variant__product__category', 'variant__selling_unit', 'variant__product').prefetch_related('variant__product__flash_sales', 'variant__product__images').all():
                 variant = item.variant
                 product = variant.product
-                price = float(variant.price)
-                base_discount = float(variant.discount_price or 0.0)
+                price = Decimal(variant.price)
+                base_discount = Decimal(variant.discount_price or 0)
                 discounted = price - base_discount
 
                 # Get active flash sale (product or category level)
                 flash_sale = product.flash_sales.filter(
                     is_active=True,
-                    start_time__lte=now,
-                    end_time__gte=now
+                    start_time__lte=now_utc,
+                    end_time__gte=now_utc
                 ).first()
 
                 if not flash_sale:
                     flash_sale = FlashSale.objects.filter(
                         categories=product.category,
                         is_active=True,
-                        start_time__lte=now,
-                        end_time__gte=now
+                        start_time__lte=now_utc,
+                        end_time__gte=now_utc
                     ).first()
 
-                flash_discount = (discounted * float(flash_sale.discount_percentage)) / 100 if flash_sale else 0.0
-                effective_price = round(discounted - flash_discount, 2)
-                total_item_price = round(effective_price * item.quantity, 2)
+                flash_discount = (discounted * Decimal(flash_sale.discount_percentage) / Decimal('100')) if flash_sale else Decimal('0.00')
+                effective_price = (discounted - flash_discount).quantize(Decimal('0.01'))
+                total_item_price = (effective_price * item.quantity).quantize(Decimal('0.01'))
 
                 total_items += item.quantity
                 total_price += total_item_price
@@ -336,24 +338,56 @@ class CartTotalAPIView(APIView):
                     "variant_id": variant.id,
                     "variant_name": f"{product.display_name} - {variant.selling_quantity} {variant.selling_unit.abbreviation}",
                     "quantity": item.quantity,
-                    "unit_price": effective_price,
-                    "total_price": total_item_price
+                    "unit_price": float(effective_price),
+                    "total_price": float(total_item_price)
                 })
 
+            # Promo code (optional) - expected in query params or GET
+            promo_code = request.query_params.get('promo_code') or request.GET.get('promo_code')
+            discount_amount = Decimal('0.00')
+            promo_code_applied = None
+
+            if promo_code:
+                try:
+                    promo = PromoCode.objects.get(code=promo_code.strip().upper())
+                    # use existing validation helper if available
+                    if promo.is_valid(user=request.user):
+                        if Decimal(total_price) >= Decimal(promo.minimum_order_amount or 0):
+                            if promo.discount_type == 'percentage':
+                                discount_amount = (Decimal(promo.discount_value) / Decimal('100')) * total_price
+                            else:
+                                discount_amount = Decimal(promo.discount_value)
+
+                            if discount_amount > total_price:
+                                discount_amount = total_price
+
+                            promo_code_applied = promo.code
+                except PromoCode.DoesNotExist:
+                    promo_code_applied = None
+
+            discounted_price = (total_price - discount_amount).quantize(Decimal('0.01'))
+
             # Get VAT percent
-            from users.models import VAT
             vat_obj = VAT.objects.order_by('-id').first()
-            vat_percent = float(vat_obj.value) if vat_obj else 0.0
-            vat_amount = round((total_price * vat_percent) / 100, 2)
-            grand_total = round(total_price + vat_amount, 2)
+            vat_percent = Decimal(vat_obj.value) if vat_obj else Decimal('0.00')
+            vat_amount = (discounted_price * vat_percent / Decimal('100')).quantize(Decimal('0.01'))
+            grand_total = (discounted_price + vat_amount).quantize(Decimal('0.01'))
+
+            # Convert current time to Saudi timezone for client reference
+            saudi_tz = pytz_timezone('Asia/Riyadh')
+            now_saudi = timezone.now().astimezone(saudi_tz).isoformat()
 
             return Response({
                 "message": "Cart total fetched successfully",
                 "total_items": total_items,
-                "total_price": round(total_price, 2),
-                "vat_percent": vat_percent,
-                "vat_amount": vat_amount,
-                "grand_total": grand_total,
+                "total_price": float(total_price.quantize(Decimal('0.01'))),
+                "promo_code": promo_code_applied,
+                "discount_amount": float(discount_amount.quantize(Decimal('0.01'))),
+                "discounted_price": float(discounted_price),
+                "vat_percent": float(vat_percent),
+                "vat_amount": float(vat_amount),
+                "grand_total": float(grand_total),
+                "now_saudi": now_saudi,
                 "items": items_data,
             }, status=status.HTTP_200_OK)
 
@@ -362,9 +396,13 @@ class CartTotalAPIView(APIView):
                 "message": "Cart not found",
                 "total_items": 0,
                 "total_price": 0.00,
+                "promo_code": None,
+                "discount_amount": 0.00,
+                "discounted_price": 0.00,
                 "vat_percent": 0.0,
                 "vat_amount": 0.0,
                 "grand_total": 0.0,
+                "now_saudi": timezone.now().astimezone(pytz_timezone('Asia/Riyadh')).isoformat(),
                 "items": []
             }, status=status.HTTP_200_OK)
 
@@ -496,7 +534,7 @@ class ActivePromoCodeListAPIView(generics.ListAPIView):
 
     def get_queryset(self):
         user = self.request.user
-        ist = pytz_timezone("Asia/Kolkata")
+        ist = pytz_timezone("Asia/Riyadh")
         now_ist = timezone.now().astimezone(ist)
 
         valid_promos = []

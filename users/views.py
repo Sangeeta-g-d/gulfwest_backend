@@ -858,7 +858,7 @@ def add_flash_sale(request):
         background_image = request.FILES.get('background_image')
 
         # Define IST timezone
-        ist = pytz.timezone('Asia/Kolkata')
+        ist = pytz.timezone('Asia/Riyadh')
 
         # Parse datetime string with 'T' separator from input
         start_time_naive = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M')
@@ -909,7 +909,7 @@ def flash_sale(request):
 @login_required_nocache
 def edit_flash_sale(request, sale_id):
     sale = get_object_or_404(FlashSale, id=sale_id)
-    ist = pytz.timezone('Asia/Kolkata')
+    ist = pytz.timezone('Asia/Riyadh')
 
     if request.method == 'POST':
         sale.name = request.POST.get('name')
@@ -1300,7 +1300,7 @@ def add_promo_code(request):
 
         try:
             # Convert datetime-local to timezone-aware datetime
-            ist = pytz_timezone("Asia/Kolkata")
+            ist = pytz_timezone("Asia/Riyadh")
             input_start = ist.localize(datetime.strptime(start_time, "%Y-%m-%dT%H:%M"))
             input_end = ist.localize(datetime.strptime(end_time, "%Y-%m-%dT%H:%M"))
 
@@ -1332,7 +1332,7 @@ def edit_promo_code(request, promo_id):
     promo = get_object_or_404(PromoCode, id=promo_id)
 
     if request.method == 'POST':
-        ist = pytz.timezone("Asia/Kolkata")
+        ist = pytz.timezone("Asia/Riyadh")
 
         promo.code = request.POST.get('code')
         promo.discount_type = request.POST.get('discount_type')

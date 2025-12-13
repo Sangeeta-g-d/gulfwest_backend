@@ -24,7 +24,7 @@ class DriverOrderSerializer(serializers.ModelSerializer):
         return obj.user.name or obj.user.email or obj.user.phone_number
 
     def get_placed_at(self, obj):
-        ist = pytz.timezone("Asia/Kolkata")
+        ist = pytz.timezone("Asia/Riyadh")
         return localtime(obj.placed_at, timezone=ist).strftime("%d-%m-%Y %I:%M %p")
 
     def get_delivery_name(self, obj):
@@ -94,7 +94,7 @@ class OrderDetailSerializer(serializers.ModelSerializer):
         return obj.user.name or obj.user.email or obj.user.phone_number
 
     def get_placed_at(self, obj):
-        ist = pytz.timezone("Asia/Kolkata")
+        ist = pytz.timezone("Asia/Riyadh")
         return localtime(obj.placed_at, timezone=ist).strftime("%d-%m-%Y %I:%M %p")
 
     # ✅ Use total_including_tax for final_total field

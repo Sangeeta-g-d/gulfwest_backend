@@ -202,12 +202,12 @@ class PromoCodeSerializer(serializers.ModelSerializer):
         ]
 
     def get_start_time_formatted(self, obj):
-        ist = pytz.timezone("Asia/Kolkata")
-        return obj.start_time.astimezone(ist).strftime("%d %B %Y, %I:%M %p")
+        saudi_tz = pytz.timezone('Asia/Riyadh')
+        return obj.start_time.astimezone(saudi_tz).strftime("%d %B %Y, %I:%M %p")
 
     def get_end_time_formatted(self, obj):
-        ist = pytz.timezone("Asia/Kolkata")
-        return obj.end_time.astimezone(ist).strftime("%d %B %Y, %I:%M %p")
+        saudi_tz = pytz.timezone('Asia/Riyadh')
+        return obj.end_time.astimezone(saudi_tz).strftime("%d %B %Y, %I:%M %p")
     
 class FlashSaleSerializer(serializers.ModelSerializer):
     background_image = serializers.SerializerMethodField()
@@ -233,12 +233,12 @@ class FlashSaleSerializer(serializers.ModelSerializer):
         return None
 
     def get_start_time(self, obj):
-        ist = pytz.timezone('Asia/Kolkata')
-        return localtime(obj.start_time, ist).strftime('%Y-%m-%d %I:%M %p')
+        saudi_tz = pytz.timezone('Asia/Riyadh')
+        return localtime(obj.start_time, saudi_tz).strftime('%Y-%m-%d %I:%M %p')
 
     def get_end_time(self, obj):
-        ist = pytz.timezone('Asia/Kolkata')
-        return localtime(obj.end_time, ist).strftime('%Y-%m-%d %I:%M %p')
+        saudi_tz = pytz.timezone('Asia/Riyadh')
+        return localtime(obj.end_time, saudi_tz).strftime('%Y-%m-%d %I:%M %p')
 
     def get_categories(self, obj):
         if obj.products.exists():
