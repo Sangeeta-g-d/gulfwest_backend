@@ -7,7 +7,17 @@
       <input type="text" id="categorySearch" class="form-control" placeholder="Search categories...">
     </div>
   </div>
+<div class="row mb-4">
+  <div class="col-md-6 mx-auto">
+    <input type="text" id="categorySearch" class="form-control" placeholder="Search categories...">
+  </div>
 
+  <div class="col-md-3 text-right">
+    <a href="{% url 'export_products_excel' %}" class="btn btn-success">
+      ⬇ Export Products
+    </a>
+  </div>
+</div>
   <!-- Category Cards -->
   <div class="row" id="categoryCards">
     {% for category in categories %}

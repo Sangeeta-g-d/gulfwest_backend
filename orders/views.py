@@ -60,6 +60,14 @@ class ConfirmOrderView(APIView):
                 return Response({'error': 'Promo code not found.'}, status=status.HTTP_404_NOT_FOUND)
 
         final_total = original_total - discount
+        MIN_ORDER_AMOUNT = Decimal('300')
+        if final_total < MIN_ORDER_AMOUNT:
+            return Response(
+                {
+                    'error': f'Minimum order value is ₹{MIN_ORDER_AMOUNT}. Please add more items.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         # ✅ Fetch VAT value (default 0 if none exists)
         vat = VAT.objects.first()

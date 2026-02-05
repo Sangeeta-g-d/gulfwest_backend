@@ -6,6 +6,8 @@ from django.core.paginator import Paginator
 from PIL import Image
 from firebase_admin.exceptions import FirebaseError
 from .utils import login_required_nocache 
+from django.http import HttpResponse
+from openpyxl import Workbook
 from django.contrib.auth.decorators import login_required
 from . models import *
 from django.db.models import Sum, Count
@@ -569,6 +571,7 @@ def products(request):
     }
     return render(request,'products.html',context)
 
+
 @login_required_nocache
 def delete_category(request, category_id):
     category = get_object_or_404(Categories, id=category_id)
@@ -703,6 +706,61 @@ def view_products(request):
     }
     return render(request, 'view_products.html', context)
 
+
+@login_required_nocache
+def export_products_excel(request):
+    search_query = request.GET.get('search', '')
+    status_filter = request.GET.get('status', '')
+
+    products = Product.objects.filter(deleted=False).order_by('-id')
+
+    if search_query:
+        products = products.filter(
+            Q(display_name__icontains=search_query) |
+            Q(SAP_code__icontains=search_query) |
+            Q(brand_name__icontains=search_query)
+        )
+
+    if status_filter:
+        products = products.filter(category__id=status_filter)
+
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Products"
+
+    # Header row
+    headers = [
+        "ID",
+        "Display Name",
+        "Brand Name",
+        "SAP Code",
+        "Category",
+        "Status",
+        "Created At"
+    ]
+    ws.append(headers)
+
+    for product in products:
+        first_variant = product.variants.first()
+        status = "Active" if first_variant and first_variant.available else "Inactive"
+
+        ws.append([
+            product.id,
+            product.display_name,
+            product.brand_name or "",
+            product.SAP_code or "",
+            product.category.category_name,
+            status,
+            product.created_at.strftime("%Y-%m-%d"),
+        ])
+
+    response = HttpResponse(
+        content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    )
+    response['Content-Disposition'] = 'attachment; filename=products.xlsx'
+
+    wb.save(response)
+    return response
 
 @login_required_nocache
 def product_details(request, product_id):
@@ -1456,28 +1514,41 @@ def privacy(request):
 
 def terms(request):
     return render(request,'terms.html')
+
 def manage_banner(request):
     banner = DashboardBanner.objects.first()
 
     if request.method == "POST":
-        image = request.FILES.get('banner_image')
-        if not image:
-            return JsonResponse({"message": "Please select an image."}, status=400)
+        image = request.FILES.get("banner_image")
+        display = request.POST.get("display") == "on"
+
+        if not image and not banner:
+            return JsonResponse(
+                {"message": "Please select an image."},
+                status=400
+            )
 
         try:
             if banner:
-                banner.image = image
+                if image:
+                    banner.image = image
+                banner.display = display
                 banner.save()
                 message = "Banner image updated successfully!"
             else:
-                DashboardBanner.objects.create(image=image)
+                DashboardBanner.objects.create(
+                    image=image,
+                    display=display
+                )
                 message = "Banner image added successfully!"
         except Exception as e:
-            return JsonResponse({"message": f"Error: {str(e)}"}, status=500)
+            return JsonResponse(
+                {"message": f"Error: {str(e)}"},
+                status=500
+            )
 
         return JsonResponse({"message": message})
 
-    # GET request
     return render(request, "admin_dashboard.html", {"banner": banner})
 
 # ✅ Manage VAT

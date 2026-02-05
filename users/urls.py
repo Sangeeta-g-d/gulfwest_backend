@@ -26,6 +26,8 @@ urlpatterns = [
     path('add_product/', views.add_product_and_variant, name='add_product'),
     path('add-images/<int:product_id>/', views.add_images, name='add_images'),
     path('view_products/', views.view_products, name='view_products'),
+    path('products/export/', views.export_products_excel, name='export_products_excel'),
+
     path('product_details/<int:product_id>/', views.product_details, name='product_details'),
     path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),
     path('edit_product_image/<int:image_id>/edit/', views.edit_product_image, name='edit_product_image'),

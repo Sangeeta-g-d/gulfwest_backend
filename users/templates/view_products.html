@@ -6,9 +6,19 @@
     <div class="col-lg-12 mb-4">
       <!-- Product Table -->
       <div class="card">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-          <h6 class="m-0 font-weight-bold text-primary">List of Products</h6>
-        </div>
+       <div class="card-header py-3 d-flex align-items-center justify-content-between">
+  <h6 class="m-0 font-weight-bold text-primary">List of Products</h6>
+  <div>
+  <a href="{% url 'export_products_excel' %}?search={{ search_query }}&status={{ status_filter }}"
+     class="btn btn-success btn-sm">
+    <i class="fas fa-file-excel"></i> Export
+  </a>
+  <a href="{% url 'add_product' %}" class="btn btn-primary btn-sm">
+    <i class="fas fa-plus"></i> Add Product
+  </a>
+  </div>
+</div>
+
           <div class="mb-3 px-3">
   <form id="searchForm" method="GET" action="{% url 'view_products' %}">
     <div class="row">
@@ -30,6 +40,7 @@
       
     </div>
   </form>
+  
 </div>
         <div class="table-responsive">
           <table class="table table-bordered table-hover">

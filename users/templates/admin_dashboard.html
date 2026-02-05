@@ -319,6 +319,18 @@ document.getElementById("vatForm").addEventListener("submit", function(e) {
             <input type="file" name="banner_image" id="banner_image" class="form-control" {% if not banner %}required{% endif %}>
           </div>
         </div>
+        <div class="form-check mt-3 text-start">
+  <input
+    class="form-check-input"
+    type="checkbox"
+    id="display"
+    name="display"
+    {% if banner and banner.display %}checked{% endif %}
+  >
+  <label class="form-check-label" for="display">
+    Display this banner on dashboard
+  </label>
+</div>
 
         <div class="modal-footer">
           <button type="submit" class="btn btn-primary">

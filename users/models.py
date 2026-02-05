@@ -145,6 +145,7 @@ class Unit(models.Model):
 class DashboardBanner(models.Model):
     image = models.ImageField(upload_to='admin_banners/')
     updated_at = models.DateTimeField(auto_now=True)
+    display = models.BooleanField(default=True)
 
     def __str__(self):
         return f"Dashboard Banner ({self.updated_at.strftime('%Y-%m-%d %H:%M')})"
