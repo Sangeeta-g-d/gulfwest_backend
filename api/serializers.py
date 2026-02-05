@@ -428,7 +428,7 @@ class DashboardBannerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DashboardBanner
-        fields = ['id', 'image_url', 'updated_at']
+        fields = ['id', 'image_url', 'updated_at', 'display']
 
     def get_image_url(self, obj):
         request = self.context.get('request')
