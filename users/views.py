@@ -260,7 +260,7 @@ def logout_view(request):
 def admin_dashboard(request):
     if not request.user.is_superuser and hasattr(request.user, 'staff_profile'):
         return redirect('staff_dashboard')
-
+    
     now = timezone.now()
     today = now.date()
 
@@ -681,6 +681,7 @@ def view_products(request):
       # Latest first
     search_query = request.GET.get('search', '')  # Get search text
     status_filter = request.GET.get('status', '')
+    active_status = request.GET.get('active_status', '')
     products = Product.objects.filter(deleted = False).order_by('-id')
     if search_query:
         if search_query:
@@ -691,6 +692,11 @@ def view_products(request):
         )
     if status_filter:
         products = products.filter(category__id=status_filter)
+    if active_status:
+        if active_status == 'active':
+            products = products.filter(is_active=True)
+        elif active_status == 'inactive':
+            products = products.filter(is_active=False)
         
     paginator = Paginator(products,15)
     page_number = request.GET.get('page')
@@ -701,6 +707,7 @@ def view_products(request):
         'products': products,
         'search_query':search_query,
         'status_filter':status_filter,
+        'active_status':active_status,
         'page_obj':page_obj,
         'categories':categories
     }
@@ -789,11 +796,26 @@ def edit_product(request, product_id):
     variants = ProductVariant.objects.filter(product=product)
 
     if request.method == 'POST':
-        print("Form Submitted!")
-        print("POST Data:", request.POST)
+        # Handle add variant modal form
+        if request.POST.get('add_variant') == '1':
+            selling_quantity = request.POST.get('selling_quantity')
+            selling_unit_id = request.POST.get('selling_unit')
+            price = request.POST.get('price')
+            discount_price = request.POST.get('discount_price') or None
+            available = request.POST.get('available') == 'on'
+            ProductVariant.objects.create(
+                product=product,
+                selling_quantity=selling_quantity,
+                selling_unit_id=selling_unit_id,
+                price=price,
+                discount_price=discount_price,
+                available=available
+            )
+            return redirect(f'/edit_product/{product_id}/?status=variant_added')
 
-        # Update product fields
+        # Otherwise, update product fields
         product.display_name = request.POST.get('display_name')
+        product.brand_name = request.POST.get('brand_name')
         product.description = request.POST.get('description')
         product.price = request.POST.get('price') or 0
         product.discount_price = request.POST.get('discount_price') or 0
@@ -812,8 +834,6 @@ def edit_product(request, product_id):
             product.selling_unit_id = selling_unit_id
 
         product.save()
-
-        print("Product updated successfully.")
         return redirect('/view_products/?edited=true')
 
     # GET request

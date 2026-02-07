@@ -9,7 +9,7 @@
        <div class="card-header py-3 d-flex align-items-center justify-content-between">
   <h6 class="m-0 font-weight-bold text-primary">List of Products</h6>
   <div>
-  <a href="{% url 'export_products_excel' %}?search={{ search_query }}&status={{ status_filter }}"
+  <a href="{% url 'export_products_excel' %}?search={{ search_query }}&status={{ status_filter }}&active_status={{ active_status }}"
      class="btn btn-success btn-sm">
     <i class="fas fa-file-excel"></i> Export
   </a>
@@ -22,18 +22,25 @@
           <div class="mb-3 px-3">
   <form id="searchForm" method="GET" action="{% url 'view_products' %}">
     <div class="row">
-      <div class="col-md-5 mb-2">
+      <div class="col-md-4 mb-2">
         <input type="text" name="search" id="inventorySearch" class="form-control" placeholder="Search product..." value="{{ search_query }}">
       </div>
       <div class="col-md-3 mb-2">
         <select name="status" id="statusFilter" class="form-control">
           <option value="">All Categories</option>
           {% for x in categories %}
-          <option value="{{x.id}}">{{x.category_name}}</option>
+          <option value="{{x.id}}" {% if x.id|stringformat:"s" == status_filter %}selected{% endif %}>{{x.category_name}}</option>
           {% endfor %}
         </select>
       </div>
       <div class="col-md-2 mb-2">
+        <select name="active_status" id="activeFilter" class="form-control">
+          <option value="">All Status</option>
+          <option value="active" {% if active_status == "active" %}selected{% endif %}>Active</option>
+          <option value="inactive" {% if active_status == "inactive" %}selected{% endif %}>Inactive</option>
+        </select>
+      </div>
+      <div class="col-md-3 mb-2">
         <button type="submit" class="btn btn-primary">Apply</button>
         <a href="{% url 'view_products' %}" class="btn btn-secondary">Reset</a>
       </div>
@@ -101,7 +108,7 @@
     <ul class="pagination">
       {% if page_obj.has_previous %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}" aria-label="Previous">
+        <a class="page-link" href="?page={{ page_obj.previous_page_number }}&search={{ search_query }}&status={{ status_filter }}&active_status={{ active_status }}" aria-label="Previous">
           <span aria-hidden="true">&laquo;</span>
         </a>
       </li>
@@ -120,14 +127,14 @@
           </li>
         {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
           <li class="page-item">
-            <a class="page-link" href="?page={{ num }}&search={{ search_query }}&status={{ status_filter }}">{{ num }}</a>
+            <a class="page-link" href="?page={{ num }}&search={{ search_query }}&status={{ status_filter }}&active_status={{ active_status }}">{{ num }}</a>
           </li>
         {% endif %}
       {% endfor %}
 
       {% if page_obj.has_next %}
       <li class="page-item">
-        <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}" aria-label="Next">
+        <a class="page-link" href="?page={{ page_obj.next_page_number }}&search={{ search_query }}&status={{ status_filter }}&active_status={{ active_status }}" aria-label="Next">
           <span aria-hidden="true">&raquo;</span>
         </a>
       </li>
