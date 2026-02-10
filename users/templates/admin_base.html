@@ -162,8 +162,8 @@
   {% elif user_roles %}
     <!-- For Staff Users - Show based on roles -->
     
-    <!-- Sales Admin: Orders & Driver -->
-    {% if 'Sales Admin' in user_roles or 'sales_admin' in user_roles %}
+    <!-- WH Admin: Orders Management & Driver Details -->
+    {% if 'WH Admin' in user_roles or 'WH admin' in user_roles or 'wh_admin' in user_roles %}
       <!-- Orders -->
       <li class="nav-item {% if current_url_name == 'orders' %}active{% endif %}">
         <a class="nav-link" href="/orders/">
@@ -172,26 +172,18 @@
         </a>
       </li>
 
-      <!-- Driver -->
+      <!-- Driver Details -->
       <li class="nav-item {% if current_url_name == 'driver' %}active{% endif %}">
         <a class="nav-link" href="/driver/">
           <i class="fas fa-truck-moving"></i>
-          <span>Driver</span>
+          <span>Driver Details</span>
         </a>
       </li>
     {% endif %}
 
-    <!-- WH Admin: Categories, View Products, Add Product, Import from Excel -->
-    {% if 'WH Admin' in user_roles or 'WH admin' in user_roles or 'wh_admin' in user_roles %}
-      <!-- Categories -->
-      <li class="nav-item {% if current_url_name == 'category' %}active{% endif %}">
-        <a class="nav-link" href="/category_list/">
-          <i class="fas fa-list-alt"></i>
-          <span>Categories</span>
-        </a>
-      </li>
-
-      <!-- View Products -->
+    <!-- Sales Admin: Products, Promo Codes, Flash Sales, Orders & Excel Import -->
+    {% if 'Sales Admin' in user_roles or 'sales_admin' in user_roles %}
+      <!-- View/Edit/Delete Products & Variants -->
       <li class="nav-item {% if current_url_name == 'products' %}active{% endif %}">
         <a class="nav-link" href="/view_products/">
           <i class="fas fa-cubes"></i>
@@ -207,22 +199,11 @@
         </a>
       </li>
 
-      <!-- Import from Excel -->
-      <li class="nav-item {% if current_url_name == 'excel' %}active{% endif %}">
-        <a class="nav-link" href="/products/">
-          <i class="fas fa-file-excel"></i>
-          <span>Import from Excel</span>
-        </a>
-      </li>
-    {% endif %}
-
-    <!-- Marketing Admin: View Products, Flash Sale, Promo Code, Onboarding Image -->
-    {% if 'Marketing Admin' in user_roles or 'marketing_admin' in user_roles %}
-      <!-- View Products -->
-      <li class="nav-item {% if current_url_name == 'products' %}active{% endif %}">
-        <a class="nav-link" href="/view_products/">
-          <i class="fas fa-cubes"></i>
-          <span>View Products</span>
+      <!-- Promo Code -->
+      <li class="nav-item {% if current_url_name == 'promo_code' %}active{% endif %}">
+        <a class="nav-link" href="/promo_code/">
+          <i class="fas fa-ticket-alt"></i>
+          <span>Promo Code</span>
         </a>
       </li>
 
@@ -234,6 +215,25 @@
         </a>
       </li>
 
+      <!-- Orders -->
+      <li class="nav-item {% if current_url_name == 'orders' %}active{% endif %}">
+        <a class="nav-link" href="/orders/">
+          <i class="fas fa-shopping-cart"></i>
+          <span>Orders</span>
+        </a>
+      </li>
+
+      <!-- Bulk Import from Excel -->
+      <li class="nav-item {% if current_url_name == 'excel' %}active{% endif %}">
+        <a class="nav-link" href="/products/">
+          <i class="fas fa-file-excel"></i>
+          <span>Bulk Import</span>
+        </a>
+      </li>
+    {% endif %}
+
+    <!-- Marketing Admin: Promo Codes, Flash Sales & Onboarding Images -->
+    {% if 'Marketing Admin' in user_roles or 'marketing_admin' in user_roles %}
       <!-- Promo Code -->
       <li class="nav-item {% if current_url_name == 'promo_code' %}active{% endif %}">
         <a class="nav-link" href="/promo_code/">
@@ -242,11 +242,19 @@
         </a>
       </li>
 
+      <!-- Flash Sale -->
+      <li class="nav-item {% if current_url_name == 'flash_sale' %}active{% endif %}">
+        <a class="nav-link" href="/flash_sale/">
+          <i class="fas fa-bolt"></i>
+          <span>Flash Sale</span>
+        </a>
+      </li>
+
       <!-- Onboarding Images -->
       <li class="nav-item {% if current_url_name == 'onboarding_images' %}active{% endif %}">
         <a class="nav-link" href="/onboarding-images/">
           <i class="fas fa-image"></i>
-          <span>Onboarding Image</span>
+          <span>Onboarding Images</span>
         </a>
       </li>
     {% endif %}
