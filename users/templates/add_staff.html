@@ -52,11 +52,11 @@
             </div>
             <div class="row">
               <div class="col-md-12 form-group mb-3">
-                <label><strong>Select Roles:</strong></label>
+                <label><strong>Select Role:</strong></label>
                 <div class="row">
                   {% for role in roles %}
                   <div class="col-md-3 form-check" style="margin-left: 15px;">
-                    <input class="form-check-input" type="checkbox" name="roles" value="{{ role.id }}"
+                    <input class="form-check-input" type="radio" name="roles" value="{{ role.id }}"
                       id="role{{ role.id }}">
                     <label class="form-check-label" for="role{{ role.id }}">{{ role.name }}</label>
                   </div>
