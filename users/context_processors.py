@@ -13,4 +13,8 @@ def user_roles(request):
                 print(f"[DEBUG] User {request.user.email} is not staff")
         except Exception as e:
             print(f"[ERROR] Error fetching user roles: {str(e)}")
-    return {'user_roles': roles}
+    return {
+        'user_roles': roles,
+        'user_role_count': len(roles),
+        'has_multiple_roles': len(roles) > 2
+    }

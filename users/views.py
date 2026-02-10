@@ -278,7 +278,7 @@ def admin_dashboard(request):
     # Dashboard metrics
     total_orders = Order.objects.count()
     total_revenue = Order.objects.aggregate(total=Sum('final_total'))['total'] or Decimal('0.00')
-    total_customers = CustomUser.objects.filter(role='customer').count()
+    total_customers = CustomUser.objects.filter(role='customer').exclude(is_superuser = True).count()
     total_products = Product.objects.filter(is_active=True, deleted=False).count()
 
     top_products = (

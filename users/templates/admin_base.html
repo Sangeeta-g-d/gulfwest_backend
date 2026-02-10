@@ -116,7 +116,7 @@
   <!-- Debug: Show user roles (remove in production) -->
   {% if not request.user.is_superuser and user_roles %}
   <li class="nav-item\">
-    <small class="px-3 text-muted\">Roles: {{ user_roles|join:', ' }}</small>
+    <small class="px-3 text-muted\">Roles: {{ user_roles|join:', ' }} ({{ user_role_count }})</small>
   </li>
   {% endif %}
   {% if request.user.is_superuser %}
@@ -159,7 +159,7 @@
         <span>Onboarding Image</span>
       </a>
     </li>
-  {% elif user_roles %}
+  {% elif has_multiple_roles %}
     <!-- For Staff Users - Show based on roles -->
     
     <!-- Sales Admin: Orders & Driver -->
